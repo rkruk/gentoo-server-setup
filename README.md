@@ -114,7 +114,7 @@ su -
 command, make neccessary changes and `exit` to become a normal user again. 
 <br>
 <br>
-Harden SSH Access:
+<p align="center">**Harden SSH Access:**
 <br>
 By default, password authentication is used to connect to your VPS via SSH. A cryptographic key pair is more secure because a private key takes the place of a password, which is generally much more difficult to brute-force.
 <br>
@@ -131,7 +131,7 @@ From your local computer:
 ```bash
 ssh-copy-id larry@172.16.254.1
 ```
-Or if you prefer `scp` command:<br><br>
+<p align="center">**Or if you prefer `scp` command:**<br><br>
 On the VPS create `.ssh` directory and change permissions for it:
 ```bash
 mkdir -p ~/.ssh && sudo chmod -R 700 ~/.ssh/ 
