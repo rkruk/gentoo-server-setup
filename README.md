@@ -9,12 +9,15 @@
 
 ----------
 <br>
+<p align="center">***
 <p align="center">**Introduction**
 
 <p align="center">First of all let me state: <br>
 **- I'm not insane**.  ¯\\_(ツ)_/¯
 <br>
-**- It is worth the effort**.
+**- It is really worth the effort**.
+<br>
+**- Contrary to popular beliefs Gentoo is not a time consuming fringe distro**
 <br>
 <br>
 I have a few Gentoo based servers with a long uptime (not like it is a bad thing..) - and I bet there are working a way better than any Ubuntu, CentOS,etc.. servers I've used in the past.<br><br> *I know - this is a* **bold** *statement to say things like that. But let me explain*:
@@ -23,6 +26,7 @@ I have a few Gentoo based servers with a long uptime (not like it is a bad thing
 <p align="left">3. Low resource footprint (really lower than anything else I have used in the past).
 <br>
 <br>
+<p align="center">*** 
 <p align="center">**Web Server**<br>
 <p align="left">While I am not aware of any Gentoo specific benchmarks that have been run on the various flavors of web servers, it is typically logical to assume that the more feature-enabled the version of web server you use, the more resources it would use.<br>
 Though Nginx is better in the raw number of requests per second it can serve than Apache or Lighttpd. At higher levels of concurrency, it can handle fewer requests per second, but still can serve double what Lighttpd does (which is already doing nearly 4x what Apache was ever able to do).<br>
