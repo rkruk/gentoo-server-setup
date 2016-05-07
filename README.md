@@ -1,5 +1,5 @@
 ***
-<p align="center">![alt tag](https://)
+<p align="center">![Gentoo](https://github.com/rkruk/gentoo-server-setup/blob/master/larry.png)
 <br>
 #### <p align="center">**Gentoo Server Setup** 
 
