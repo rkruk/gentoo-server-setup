@@ -131,7 +131,7 @@ From your local computer:
 ```bash
 ssh-copy-id larry@172.16.254.1
 ```
-Or if you prefer `scp` command:<br>
+Or if you prefer `scp` command:<br><br>
 On the VPS create `.ssh` directory and change permissions for it:
 ```bash
 mkdir -p ~/.ssh && sudo chmod -R 700 ~/.ssh/ 
