@@ -12,7 +12,7 @@
 <p align="center">**Introduction**
 
 <p align="center">First of all let me state: <br>
-**- I'm not insane**.
+**- I'm not insane**.  ¯\\_(ツ)_/¯
 <br>
 **- It is worth the effort**.
 <br>
