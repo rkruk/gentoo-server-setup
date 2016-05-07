@@ -120,7 +120,7 @@ command, make neccessary changes and `exit` to become a normal user again.
 <br>
 <p align="left">By default, password authentication is used to connect to your VPS via SSH. A cryptographic key pair is more secure because a private key takes the place of a password, which is generally much more difficult to brute-force.
 <br>
-#####Create an Authentication Key-pair.
+<p align="center">Create an Authentication Key-pair.
 <br>
 <p align="center">**!!! This is done on your local computer, not on your VPS !!!** 
 <p align="left">We are going to create a 4096-bit RSA key pair here. During creation of the key, you will be given the option to encrypt the private key with a passphrase. This means that key cannot be used without entering the passphrase. I suggest to use the key pair with a passphrase.
