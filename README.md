@@ -3,7 +3,7 @@
 <br>
 #### <p align="center">**Gentoo Server Setup** 
 
-<p align="center">Set Up your own Gentoo Web Server <br> or Cloud VPS 
+<p align="center">~Set Up your own Gentoo Web Server <br> or Cloud VPS~
 
 ------------------------------------------------------------------------
 
