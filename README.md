@@ -28,10 +28,10 @@ I have a few Gentoo based servers with a long uptime (not like it is a bad thing
 <br>
 <br>
 <p align="center">***
-<p align="center">Hosting
+<p align="center">**Hosting**
 <p align="left">There are a few VPS providers out there allowing you to set up your own Gentoo VPS directly (Shout out to <a href="https://linode.com">Linode</a>) or to install your own ISO (Awesome people at<a href="https://wiki.gandi.net/en/hosting/create-server/private-image"> Gandi.net</a>).
-<p align="left">*I'm sure there is more providers I'm not aware of offering custom ISO install allowing you to install Gentoo on their infrastructure.*
-<p align="left">*If you are lucky to have your own server (not the cloud thingy) I'm sure you can use this howto without any problems or changes.*
+<p align="left">-I'm sure there is more providers I'm not aware of offering custom ISO install allowing you to install Gentoo on their infrastructure.
+<p align="left">-If you are lucky to have your own server (not the cloud thingy) I'm sure you can use this howto without any problems or changes.
 <p align="left">*I'm going to use Linode's VPS as an installation example here. Adapt it to your own needs as you like.*
 <p align="left">I won't cover here installation process - Linode will roll it out for you automatically with the help of their installation scripts - just do some magic with with help of your mouse and keyboard. It is straightforward process and it is extremely easy to do that. Otherwise install it on your own with the use of one of the best documentations written ever at the <a href="https://www.gentoo.org/">gentoo.org</a>.
 <br>
