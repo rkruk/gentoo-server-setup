@@ -27,8 +27,8 @@ I have a few Gentoo based servers with a long uptime (not like it is a bad thing
 <p align="left">3. Low resource footprint (for real - it is lower than anything else I have used in the past).
 <br>
 <br>
-<h4 align="center">***
-<h4 align="center">Hosting
+<p align="center">***
+<p align="center">Hosting
 <p align="left">There are a few VPS providers out there allowing you to set up your own Gentoo VPS directly (Shout out to <a href="https://linode.com">Linode</a>) or to install your own ISO (Awesome people at<a href="https://wiki.gandi.net/en/hosting/create-server/private-image"> Gandi.net</a>).
 <p align="left">*I'm sure there is more providers I'm not aware of offering custom ISO install allowing you to install Gentoo on their infrastructure.*
 <p align="left">*If you are lucky to have your own server (not the cloud thingy) I'm sure you can use this howto without any problems or changes.*
@@ -36,8 +36,8 @@ I have a few Gentoo based servers with a long uptime (not like it is a bad thing
 <p align="left">I won't cover here installation process - Linode will roll it out for you automatically with the help of their installation scripts - just do some magic with with help of your mouse and keyboard. It is straightforward process and it is extremely easy to do that. Otherwise install it on your own with the use of one of the best documentations written ever at the <a href="https://www.gentoo.org/">gentoo.org</a>.
 <br>
 <br>
-<h4 align="center">*** 
-<h4 align="center">**First Steps**<br>
+<p align="center">*** 
+<p align="center">**First Steps**<br>
 <p align="left">*Lets assume that you already installed your Gentoo based VPS and you know how to connect through SSH onto it. Your server should be up and running ofcourse.*
 <br>
 <p align="left">Lets start and log in to our new server through the SSH. Enter the following into your terminal window or application. Be sure to replace the example IP address with your Linode’s IP address (Linode users: you can find it in the --> 'Linodes' tab --> 'Remote Access' tab). Change example address into your VPS address. As a example here I'll use IP: 172.16.254.1 (IPv4 address taken from wikipedia article about IP :/):
@@ -120,7 +120,7 @@ By default, password authentication is used to connect to your VPS via SSH. A cr
 <br>
 Create an Authentication Key-pair:
 <br>
-<h6 align="left">!!! This is done on your local computer, not on your VPS !!! 
+<p align="left">!!! This is done on your local computer, not on your VPS !!! 
 <p align="left">We are going to create a 4096-bit RSA key pair here. During creation of the key, you will be given the option to encrypt the private key with a passphrase. This means that key cannot be used without entering the passphrase. I suggest to use the key pair with a passphrase.
 ```bash
 ssh-keygen -b 4096
