@@ -143,7 +143,10 @@ From your local computer:
 ```bash
 scp ~/.ssh/id_rsa.pub example_user@203.0.113.10:~/.ssh/authorized_keys
 ```
-
+###To Do:
+<br>
+server configuration, security, software, services,etc...
+<br><br>
 <p align="center">*** 
 <p align="center">**NGINX Web Server**<br>
 <p align="left">While I am not aware of any Gentoo specific benchmarks that have been run on the various flavors of web servers, it is typically logical to assume that the more feature-enabled the version of web server you use, the more resources it would use.<br>
