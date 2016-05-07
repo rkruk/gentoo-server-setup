@@ -18,7 +18,7 @@
 <br><br>
 **-It is really worth the effort**.
 <br><br>
--Contrary to popular beliefs Gentoo is not a time consuming fringe distro
+-Contrary to popular beliefs Gentoo is not a time consuming fringe distro.
 <br>
 <br>
 I have a few Gentoo based servers with a long uptime (not like it is a bad thing..) - and I bet there are working a way better than any Ubuntu, CentOS,etc.. servers I've used in the past.<br><br> *I know - this is a* **bold** *statement to say things like that. But let me explain*:
@@ -141,7 +141,7 @@ mkdir -p ~/.ssh && sudo chmod -R 700 ~/.ssh/
 ```
 From your local computer:
 ```bash
-scp ~/.ssh/id_rsa.pub example_user@203.0.113.10:~/.ssh/authorized_keys
+scp ~/.ssh/id_rsa.pub example_user@172.16.254.1:~/.ssh/authorized_keys
 ```
 ###To Do:
 <br>
