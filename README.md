@@ -18,19 +18,19 @@
 <br><br>
 **-It is really worth the effort**.
 <br><br>
--Contrary to popular beliefs Gentoo is not a time consuming fringe distro.
+-Contrary to popular beliefs Gentoo is not a time consuming fringe distro. Trough the past years I've used and tested most of existing Linux and *BSD based Distributions - that is a fascinating yet tedious hobby of mine. Don't ask me why.. - it is just my thing. By most I mean, like distrowatch.com from top to bottom (and a few more - non existing any more).  
 <br>
 <br>
-I have a few Gentoo based servers with a long uptime (not like it is a bad thing..) - and I bet there are working a way better than any Ubuntu, CentOS,etc.. servers I've used in the past.<br><br> *I know - this is a* **bold** *statement to say things like that. But let me explain*:
-<p align="left">1. Continous uptime without the need of reboot to switch to the new version of the kernel, services,etc..
-<p align="left">2. System is fully customisable, every single part can be adjusted as you like it, every daemon, service - you decide what you want - not the distro maintainers with tedious dependencies forcing you to use THAT version of software. Example: NTP daemon is quite resource heavy for a small daemon - I chenged it openntpd. Same thing with log damemons, web servers,.. 
-<p align="left">3. Low resource footprint (for real - it is lower than anything else I have used in the past).
+Currently I have a few Gentoo based servers with a long uptime (not like it is a bad thing..) - and I bet they are working a way better than any Ubuntu, CentOS, etc.. servers I've used in the past.<br><br> *I know - this is a* **bold** *statement to say things like that. But let me explain*:
+<p align="left">1. Continous uptime without the need of reboot to switch to the new version of the kernel, services,etc.. (sometimes it is tricky but possible (kernel - duh!)).
+<p align="left">2. System is fully customisable, every single part can be adjusted as you like it, every daemon, service - you decide what you want - not the distro maintainers with tedious dependencies forcing you to use THAT version of THAT software. Example: NTP daemon is quite resource heavy for a small daemon - I've changed it to openntpd (use less resources). Same thing with all log damemons, web servers, etc.. Yes, you can do that on any other distro. But I wonder if you can remove all that not needed dependecies of yours? :D
+<p align="left">3. Low resource footprint (for real - it is lower than anything else I have ever used in the past - lower than debian - for real).
 <br>
 <br>
 <p align="center">***
 <p align="center">**Hosting**
-<p align="left">There are a few VPS providers out there allowing you to set up your own Gentoo VPS directly (Shout out to <a href="https://linode.com">Linode</a>) or to install your own ISO (Awesome people at<a href="https://wiki.gandi.net/en/hosting/create-server/private-image"> Gandi.net</a>).
-<p align="left">-I'm sure there is more providers I'm not aware of offering custom ISO install allowing you to install Gentoo on their infrastructure.
+<p align="left">You can install it on your own hardware if you have it. You can rent a rack somewhere if you have cash to burn. Or you can use VPS. There are a few VPS providers out there allowing you to set up your own Gentoo VPS directly (Shout out to <a href="https://linode.com">Linode</a>) or to install your own ISO (Awesome people at<a href="https://wiki.gandi.net/en/hosting/create-server/private-image"> Gandi.net</a>).
+<p align="left">-I'm sure there is more providers I'm not aware of offering custom ISO install allowing you to set your own Gentoo on their infrastructure.
 <p align="left">-If you are lucky to have your own server (not the cloud thingy) I'm sure you can use this howto without any problems or changes.
 <p align="left">*I'm going to use Linode's VPS as an installation example here. Adapt it to your own needs as you like.*
 <p align="left">I won't cover here installation process - Linode will roll it out for you automatically with the help of their installation scripts - just do some magic with with help of your mouse and keyboard. It is straightforward process and it is extremely easy to do that. Otherwise install it on your own with the use of one of the best documentations written ever at the <a href="https://www.gentoo.org/">gentoo.org</a>.
@@ -38,7 +38,7 @@ I have a few Gentoo based servers with a long uptime (not like it is a bad thing
 <br>
 <p align="center">*** 
 <p align="center">**First Steps**<br>
-<p align="left">*Lets assume that you already installed your Gentoo based VPS and you know how to connect through SSH onto it. Your server should be up and running ofcourse.*
+<p align="left">*Lets assume that you already installed your Gentoo based system and you know how to connect through SSH onto it. Your server should be up and running of course.*
 <br>
 <p align="left">Lets start and log in to our new server through the SSH. Enter the following into your terminal window or application. Be sure to replace the example IP address with your Linode’s IP address (Linode users: you can find it in the --> 'Linodes' tab --> 'Remote Access' tab). Change example address into your VPS address. As a example here I'll use IP: 172.16.254.1 (IPv4 address taken from wikipedia article about IP :/):
 ```bash
@@ -53,7 +53,7 @@ I would recommend update the whole thing (at Gentoo it is better to know about a
 ```bash
 emerge -uavDN @world 
 ```
-I hope you came here with some knowledge already, and there is no need to explain what this command does.
+I hope you came here with some knowledge already, and there is no need to explain what this command does! If not - go and read some manuals. Gentoo won't forgive you any lack of knowledge ;)
 <br>
 After that let's set up a Hostname and fully qualified domain name (FQDN):
 Enter the following commands to set the hostname, replacing hostname with the hostname of your choice:
@@ -83,20 +83,20 @@ And manually symlink a zone file in /usr/share/zoneinfo to /etc/localtime:
 ```bash
 ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime
 ```
-As I'm based in the UK I set it up in this example for the UK based zone.
+As I'm based in the UK I'm going to set it up in this example for the UK based zone. 
 <br>
 Confirm the new settings:
 ```bash
 date
 ```
 <br>
-Add a Limited User Account for day-to-day use (in this example I choose a 'Larry' username):<br>
+Add a Limited User Account for day-to-day use (in this example I choose a 'larry' username):<br>
 ```bash
 useradd -m -G users,wheel -s /bin/bash larry
 ```
 and set up a password for a new user:
 ```bash
-passwd
+passwd larry
 ```
 <br>
 With the new user set you can now log out from your VPS. There is no need to use a root account to log into your server (it is considered as a extremely dangerous though - we'll block that option later).
@@ -112,6 +112,8 @@ Now you can administer your server from your new user account instead of root. I
 su -
 ```
 command, make neccessary changes and `exit` to become a normal user again. 
+
+Or add your everyday user to the group 'wheel' and use 'sudo' with all mayor commands (I'm not sure if it is secure wise on server env - need to research that one. I will update it).
 <br>
 <br>
 <br>
