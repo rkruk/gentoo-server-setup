@@ -40,9 +40,9 @@ Currently I have a few Gentoo based servers with a long uptime (not like it is a
 <p align="center">**First Steps**<br>
 <p align="left">*Lets assume that you already installed your Gentoo based system and you know how to connect through SSH onto it. Your server should be up and running of course.*
 <br>
-<p align="left">Lets start and log in to our new server through the SSH. Enter the following into your terminal window or application. Be sure to replace the example IP address with your Linode’s IP address (Linode users: you can find it in the --> 'Linodes' tab --> 'Remote Access' tab). Change example address into your VPS address. As a example here I'll use IP: 172.16.254.1 (IPv4 address taken from wikipedia article about IP :/):
+<p align="left">Lets start and log in to our new server through the SSH. Enter the following into your terminal window or application. Be sure to replace the example IP address with your Linode’s IP address (Linode users: you can find it in the --> 'Linodes' tab --> 'Remote Access' tab). Change example address into your VPS address. As a example here I'll use IP: 123.456.78.9 (obviously this is not a real address - right?):
 ```bash
-ssh root@172.16.254.1
+ssh root@123.456.78.9
 ```
 Yes, first login is as a root user. We'll change it later during the configuration of our new server.<br>
 First things first let's synchronize server repositories:
@@ -64,12 +64,17 @@ and then:
 ```bash
 /etc/init.d/hostname restart
 ```
-Next lets update the `/etc/hosts` file. This file creates static associations between IP addresses and hostnames, with higher priority than DNS. In the example below, 172.16.254.1 is our public IP address, hostname is our local hostname, and hostname.example.com is our FQDN. Your `/etc/hosts` file should look like that:
+Next lets update the `/etc/hosts` file. This file creates static associations between IP addresses and hostnames, with higher priority than DNS. In the example below, 123.456.78.9 is our public IP address, hostname is our local hostname, and hostname.example.com is our FQDN. Your `/etc/hosts` file should look like that:
 ```bash
 127.0.0.1 localhost.localdomain localhost
-203.0.113.10 hostname.example.com hostname
+123.456.78.9 hostname.example.com hostname
 ```
+Don't edit first '127.0.0.1' line, it is for internal server network - but it is recommended to add the second line with the right IP address and your Fully Qualified Domain Name with a twist.
+You are owner of example.com and in your /etc/hostname your server has its own name (here it is 'hostname' but you can name it as you want it).
+
+hostname.example.com doesn't need to be your actual domain (example.com) but it is recommended to actually have registered domain you are using for that FQDN purposes.
 <br>
+
 `hostname.example.com` is our FQDN here. The value you assign as your system’s FQDN should have an “A” record in DNS pointing to your Linode’s IPv4 address.
 <br><br>
 As you can see here the configuration files are self explanatory. When you changed all informations in the `hosts` file do: CTRL + X (save & exit) and ENTER to confirm.
