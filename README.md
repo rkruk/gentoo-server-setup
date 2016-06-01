@@ -128,7 +128,7 @@ Or add your everyday user to the group 'wheel' and use 'sudo' with all mayor com
 <p align="center">**!!! This is done on your local computer, not on your VPS !!!** 
 <p align="left">We are going to create a 4096-bit RSA key pair here. During creation of the key, you will be given the option to encrypt the private key with a passphrase. This means that key cannot be used without entering the passphrase. I suggest to use the key pair with a passphrase.
 ```bash
-ssh-keygen -b 4096
+ssh-keygen -b 8192
 ```
 Press `Enter` to use the default names id_rsa and id_rsa.pub in /home/your_username/.ssh - before entering your passphrase.<br>
 Next let's upload the public key to your server. Replace `larry` user with the name of the user you created on the server, and 172.16.254.1 with your VPS IP address.<br>
