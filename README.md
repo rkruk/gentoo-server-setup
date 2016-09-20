@@ -42,7 +42,8 @@ Same thing is with all log damemons, web servers, firewalls, etc.. Yes, you can 
 <p align="center">**First Steps**<br>
 <p align="left">*I assume that you already installed your Gentoo based system and you know how to connect through SSH onto it. Your server should be up and running already of course.*
 <br>
-<p align="left">Lets start and log in to our new server through the SSH. Enter the following into your terminal window or application (putty --> if you are using silly Windows based OS :/ ). Be sure to replace the example IP address with your server IP address (Linode users: you can find it in the --> 'Linodes' tab --> 'Remote Access' tab). As a example here I'll use IP: 123.456.78.9 address:<br>
+<p align="left">Lets start and log in to our new server through the SSH. Enter the following into your terminal window or application (putty --> if you are using silly Windows based OS :/ ). Be sure to replace the example IP address with your server IP address (Linode users: you can find it in the &#8594; 'Linodes' tab &#8594; 'Remote Access' tab). As a example here I'll use IP: 123.456.78.9 address:<br>
+
 ```bash
 ssh root@123.456.78.9
 ```
