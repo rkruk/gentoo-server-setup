@@ -96,10 +96,9 @@ It is highly recommended to have registered domain/subdomain on the DNS level fo
 <br><br>
 `hostname.example.com` is our FQDN here. The value you assign as your system’s FQDN should have an “A” record in DNS pointing to your's server address.
 <br><br>
-As you can see here the configuration files are self explanatory.<br>
+As you can see here all server configuration files are self explanatory :D<br>
 <br><br>
-<!-- Done to this line -->
-Setting up the Timezone:<br>
+Lets continue now with setting up the Timezone for the server.<br>
 View the list of all available zone files:
 ```bash
 ls /usr/share/zoneinfo
@@ -110,24 +109,37 @@ ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime
 ```
 As I'm based in the UK I'm going to set it up in this example for the UK based zone. 
 <br>
-Confirm the new settings:
+Confirm that the timezone is set correctly:
 ```bash
 date
 ```
 <br>
-Add a Limited User Account for day-to-day use (in this example I choose a 'larry' username):<br>
+Add a Limited User Account for day-to-day use with limited rights (in this example I choose a 'larry' username):<br>
 ```bash
 useradd -m -G users,wheel -s /bin/bash larry
 ```
-and set up a password for a new user:
+and set up a password:
 ```bash
 passwd larry
 ```
-<br>
-With the new user set you can now log out from your VPS. There is no need to use a root account to log into your server (it is considered as a extremely dangerous though - we'll block that option later).
+Add user to the `wheel` group (`wheel` sudo group so you’ll have administrative privileges):
+```bash
+usermod -aG wheel larry
+```
+Check if the `wheel` group is uncommented in the `/etc/sudoers` file:
+```bash
+nano /etc/sudoers
+```
+and look for the line:
+```bash
+  %wheel ALL=(ALL) ALL
+```
+Save all changes.<br>
+With the new user set you can now log out from your VPS. There is no need to use a root account to log into your server (it is considered as a extremely stupid and dangerous though - we'll block that option later).
 ```bash
 exit
 ```
+<!-- Done to this line -->
 Log back in as your new user(here it will be: 'Larry'). Remember to change IP address to your VPS IP address:
 ```bash
 ssh larry@172.16.254.1
