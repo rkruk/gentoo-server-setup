@@ -158,6 +158,7 @@ Use your everyday user with the 'sudo' priviliges for all mayor administration c
 <br>
 <br>
 <br>
+<!-- EDITION DONE TO THIS LINE -->
 <p align="center">***
 <p align="center">**Harden SSH Access:**
 <br>
