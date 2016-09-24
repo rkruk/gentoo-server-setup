@@ -132,7 +132,7 @@ nano /etc/sudoers
 ```
 and look for the line:
 ```bash
-  %wheel ALL=(ALL) ALL
+%wheel ALL=(ALL) ALL
 ```
 Save all changes.<br>
 With the new user set you can now log out from your VPS. There is no need to use a root account to log into your server (it is considered as a extremely stupid and dangerous though - we'll block that option later).
