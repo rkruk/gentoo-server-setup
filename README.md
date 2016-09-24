@@ -140,11 +140,11 @@ With the new user set you can now log out from your VPS. There is no need to use
 exit
 ```
 <br>
-Log back in with your new user (here it will be: 'Larry'). Remember to change IP address to your VPS IP address:
+Log back in with your new user (here it will be: 'Larry'). Remember to use IP address of your server:
 ```bash
 ssh larry@172.16.254.1
 ```
-Now you can administer your server from your new user account instead of root. If you really want to become a `root` user just use the:
+Now you can administer server from your new user account instead of root. If you really want to become a `root` user just use the:
 ```bash
 su -
 ```
@@ -158,7 +158,11 @@ Use your everyday user with the 'sudo' priviliges for all mayor administration c
 <br>
 <br>
 <br>
-<!-- EDITION DONE TO THIS LINE -->
+
+<!-- EDITION DONE TO THIS LINE 
+     SSH part needs to be revised!
+-->
+
 <p align="center">***
 <p align="center">**Harden SSH Access:**
 <br>
@@ -167,8 +171,14 @@ Use your everyday user with the 'sudo' priviliges for all mayor administration c
 <br>
 <p align="center">Create an Authentication Key-pair:
 <br>
-<p align="center">**!!! This is done on your local computer, not on your VPS !!!** 
-<p align="left">We are going to create a 4096-bit RSA key pair here. During creation of the key, you will be given the option to encrypt the private key with a passphrase. This means that key cannot be used without entering the passphrase. I suggest to use the key pair with a passphrase.
+<p align="center">**!!! This is done on your local computer, not on the VPS !!!**
+
+<!-- KEY STRENGTH - research and update!! -->
+<p align="left">We are going to create a 4096-bit RSA key pair here. There are voices in the community that we should use bigger, better, stronger keys. But key is only one part of the security. And right now, a 2048-bit RSA key, or any greater length (such as the 4096-bit key size of the Github suggestion), is unbreakable with today's technology and known factorization algorithms. Even with very optimistic assumptions on the future improvements of computational power available for a given price (namely, that Moore's law holds at its peak rate for the next three decades), a 2048-bit RSA key won't become breakable within the next 30 years by Mankind as a whole, let alone by an Earth-based organization. Of course, there always remains the possibility of some unforeseen mathematical breakthrough that makes breaking RSA keys a lot easier. Unforeseen breakthroughs are, by definition, unpredictable, so any debate on that subject is by nature highly speculative.
+
+Just to be sure we are going to use 4096-bit overkill key (overkill for that small vps of ours).
+
+During creation of the key, you will be given the option to encrypt the private key with a passphrase. This means that key cannot be used without entering the passphrase. I suggest to use the key pair with a passphrase.
 ```bash
 ssh-keygen -b 8192
 ```
