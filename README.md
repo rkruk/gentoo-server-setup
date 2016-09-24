@@ -61,33 +61,44 @@ emerge -uavDN system && emerge -uavDN world
 <br>
 I hope you came here with some knowledge already, and there is no need to explain what this command does! If not - stop now and go read some manuals first. Gentoo won't forgive you any lack of knowledge ;)
 <br>
-When the update and all post-update requests are done (like: writing missing packages and flags in the `/etc/portage/package.keywords`, `/etc/portage/make.conf `, `/etc/portage/package.mask`, or changing configs with `etc-update`, etc..) we can go and start our configuration. :D <br><br>
-Let's start with setting up a Hostname and fully qualified domain name (FQDN):
-Enter the following commands to set the hostname, replacing hostname with the hostname of your choice: <br>
+When the update and all post-update requests are done... (joke!)<br>
+OK. First major update will for sure flag some problems with packages dependecies. Dealing with those errors is sometimes tricky and time consuming. But in Gentoo there is no way you cannot work around it. Gentoo documentation is very detailed and you will love it. Most of the problems are easy to avoid if you follow <a href="https://wiki.gentoo.org/wiki/Handbook:AMD64/Working/Portage">portage documentation</a>.<br> You will be forced to update content of portage configuration files in the `/etc/portage/`like: setting appropriate flags for packages in the `/etc/portage/package.use`, configuring entire system in the `/etc/portage/make.conf `, setting package versions in the `/etc/portage/package.mask`, `/etc/portage/package.unmask` and `/etc/portage/package.accept_keywords`.<br> Just make sure you know what you are doing there!<br>
+After that carefully read what `etc-update` and `dispatch-conf` tools are telling you to do and <a href="https://wiki.gentoo.org/wiki/Handbook:X86/Portage/Tools">follow instructions</a>.<br><br>
+And finally when the `emerge -uavDN system && emerge -uavDN world` update is done fully and Gentoo accepted your sacrifice :D - you can begin setting up and configure your server for web.<br><br>
+Let's start with setting up a Hostname and fully qualified domain name (<a href="http://gentoo-en.vfose.ru/wiki/Fully_Qualified_Domain_Name_Configuration">FQDN</a>) and enter the following commands to set the hostname, replacing hostname with the hostname of your choice:
 ```bash
 echo "HOSTNAME=\"hostname\"" > /etc/conf.d/hostname
 ```
-<br>
-and then: <br>
+and then:
 ```bash
 /etc/init.d/hostname restart
 ```
-<br>
-Next lets update the `/etc/hosts` file. This file creates static associations between IP addresses and hostnames, with higher priority than DNS. In the example below, 123.456.78.9 is our public IP address, hostname is our local hostname, and hostname.example.com is our FQDN. Your `/etc/hosts` file should look like that:
+and/or:
+```bash
+echo "your hostname" > /etc/hostname
+```
+Check your hostname:
+```bash
+hostname -F /etc/hostname
+hostname
+```
+
+Next lets update the `/etc/hosts` file.<br> 
+This file creates static associations between IP addresses and hostnames, with higher priority than DNS!<br> 
+In the example below, `123.456.78.9` is our public accessible IP address, `hostname` is our local hostname, and `hostname.example.com` is our FQDN. Your `/etc/hosts` file should look like that:
 ```bash
 127.0.0.1 localhost.localdomain localhost
 123.456.78.9 hostname.example.com hostname
 ```
-Don't edit first '127.0.0.1' line, it is for internal server network - but it is recommended to add the second line with the right IP address and your Fully Qualified Domain Name with a twist.
-You are owner of example.com and in your /etc/hostname your server has its own name (here it is 'hostname' but you can name it as you want it).
-
-hostname.example.com doesn't need to be your actual domain (example.com) but it is recommended to actually have registered domain you are using for that FQDN purposes.
-<br>
-
-`hostname.example.com` is our FQDN here. The value you assign as your system’s FQDN should have an “A” record in DNS pointing to your Linode’s IPv4 address.
+Don't edit first '127.0.0.1' line, it is for localhost internal server loopback network - but it is highly recommended to add the second line with the right IP address and your Fully Qualified Domain Name.<br>
+You are the owner of `example.com` and in the `/etc/hostname` your server has its own name (here it is `hostname` but you can name it as you want it - it doesn't really matter). FQDN does not need to have any relationship to websites hosted on this server. As an example, you might host “example.com” website on your server, but the system’s FQDN might be “xyz.example.com.”<br><br>
+It is highly recommended to have registered domain/subdomain on the DNS level for FQDN purposes.
 <br><br>
-As you can see here the configuration files are self explanatory. When you changed all informations in the `hosts` file do: CTRL + X (save & exit) and ENTER to confirm.
+`hostname.example.com` is our FQDN here. The value you assign as your system’s FQDN should have an “A” record in DNS pointing to your's server address.
 <br><br>
+As you can see here the configuration files are self explanatory.<br>
+<br><br>
+<!-- Done to this line -->
 Setting up the Timezone:<br>
 View the list of all available zone files:
 ```bash
