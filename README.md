@@ -139,18 +139,22 @@ With the new user set you can now log out from your VPS. There is no need to use
 ```bash
 exit
 ```
-<!-- Done to this line -->
-Log back in as your new user(here it will be: 'Larry'). Remember to change IP address to your VPS IP address:
+<br>
+Log back in with your new user (here it will be: 'Larry'). Remember to change IP address to your VPS IP address:
 ```bash
 ssh larry@172.16.254.1
 ```
-Now you can administer your server from your new user account instead of root. If you want to become a `root` just use the:
+Now you can administer your server from your new user account instead of root. If you really want to become a `root` user just use the:
 ```bash
 su -
 ```
-command, make neccessary changes and `exit` to become a normal user again. 
+Make neccessary changes and then `exit` to become a normal user again.<br>
+Or
+```bash
+sudo example-command
+```
 
-Or add your everyday user to the group 'wheel' and use 'sudo' with all mayor commands (I'm not sure if it is secure wise on server env - need to research that one. I will update it).
+Use your everyday user with the 'sudo' priviliges for all mayor administration commands.
 <br>
 <br>
 <br>
