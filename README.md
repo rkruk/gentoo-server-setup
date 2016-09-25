@@ -159,25 +159,23 @@ Use your everyday user with the 'sudo' priviliges for all mayor administration c
 <br>
 <br>
 
-<!-- EDITION DONE TO THIS LINE 
-     SSH part needs to be revised!
--->
-
 <p align="center">***
 <p align="center">**Harden SSH Access:**
 <br>
-<p align="left">By default, password authentication is used to connect to your VPS via SSH. A cryptographic key pair is more secure because a private key takes the place of a password, which is generally much more difficult to brute-force.
+<p align="left">By default, password authentication is used to connect to most VPS via SSH (at least at Linode, Nephoscale, AWS, Gandi). And we are going to change that with the use of the SSH keys. A cryptographic key pair is more secure way to log in to your VPS because a private key takes the place of a password, which is generally much more difficult to brute-force. Why?<br>
+SSH keys serve as a means of identifying yourself to an SSH server using public-key cryptography and challenge-response authentication. One immediate advantage this method has over traditional password authentication is that you can be authenticated by the server without ever having to send your password over the network. Anyone eavesdropping on your connection will not be able to intercept and crack your password because it is never actually transmitted. Additionally, as I wrote previously using SSH keys for authentication virtually eliminates the risk posed by brute-force password attacks by drastically reducing the chances of the attacker correctly guessing the proper credentials.<br>
+I'll use here default RSA based key therefore there is no need to specify `ssh-keygen` with the `-t` option. RSA provides the best compatibility of all algorithms but requires the key size to be larger to provide sufficient security.
+Minimum key size is 1024 bits, default is 2048 (see `man ssh-keygen`) and maximum is 16384. 
 <br>
 <br>
 <p align="center">Create an Authentication Key-pair:
 <br>
-<p align="center">**!!! This is done on your local computer, not on the VPS !!!**
+<p align="center">**(This has to be done on your local computer, not on the VPS !!!)**
 
-<!-- KEY STRENGTH - research and update!! -->
-<p align="left">We are going to create a 4096-bit RSA key pair here. There are voices in the community that we should use bigger, better, stronger keys. But key is only one part of the security. And right now, a 2048-bit RSA key, or any greater length (such as the 4096-bit key size of the Github suggestion), is unbreakable with today's technology and known factorization algorithms. Even with very optimistic assumptions on the future improvements of computational power available for a given price (namely, that Moore's law holds at its peak rate for the next three decades), a 2048-bit RSA key won't become breakable within the next 30 years by Mankind as a whole, let alone by an Earth-based organization. Of course, there always remains the possibility of some unforeseen mathematical breakthrough that makes breaking RSA keys a lot easier. Unforeseen breakthroughs are, by definition, unpredictable, so any debate on that subject is by nature highly speculative.
-
-Just to be sure we are going to use 4096-bit overkill key (overkill for that small vps of ours).
-
+<p align="left">We are going to create a 8192-bit RSA key pair here. There are voices in the community that we should use bigger, better, stronger keys. But key is only one small part of the security. And right now, a default 2048-bit RSA key, or any greater length (such as the 4096-bit key size of the Github suggestion), is unbreakable with today's technology and known factorization algorithms. Even with very optimistic assumptions on the future improvements of computational power available for a given price (namely, that Moore's law holds at its peak rate for the next three decades), a 3072-bit RSA key won't become breakable within the next 30 years by Mankind as a whole, let alone by an Earth-based organization. Of course, there always remains the possibility of some unforeseen mathematical breakthrough that makes breaking RSA keys a lot easier. Unforeseen breakthroughs are, by definition, unpredictable, so any debate on that subject is by nature highly speculative.<br>If you need more security than default RSA-2048 offers, the way to go would be to switch to elliptical curve cryptography (ed25519)<br>
+<!-- EDITION DONE TO THIS LINE 
+     SSH part needs to be revised!
+-->
 During creation of the key, you will be given the option to encrypt the private key with a passphrase. This means that key cannot be used without entering the passphrase. I suggest to use the key pair with a passphrase.
 ```bash
 ssh-keygen -b 8192
