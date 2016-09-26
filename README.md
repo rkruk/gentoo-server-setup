@@ -73,11 +73,13 @@ and then:
 ```bash
 /etc/init.d/hostname restart
 ```
-and/or:
+Hostname can be set also in the:
 ```bash
 echo "your hostname" > /etc/hostname
 ```
-Check your hostname:
+You should check which configuration your server has. just check inside of /etc directory for hostname file or inside /etc/conf.d/. Then pick the right command. Not before!
+
+After that check your hostname:
 ```bash
 hostname -F /etc/hostname
 hostname
