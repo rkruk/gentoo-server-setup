@@ -144,7 +144,7 @@ exit
 <br>
 Log back in with your new user (here it will be: 'Larry'). Remember to use IP address of your server:
 ```bash
-ssh larry@172.16.254.1
+ssh larry@123.456.78.9
 ```
 Now you can administer server from your new user account instead of root. If you really want to become a `root` user just use the:
 ```bash
@@ -186,7 +186,7 @@ Press `Enter` to use the default names id_rsa and id_rsa.pub in /home/your_usern
 Next let's upload the public key to your server. Replace `larry` user with the name of the user you created on the server, and 172.16.254.1 with your VPS IP address.<br>
 From your local computer:
 ```bash
-ssh-copy-id larry@172.16.254.1
+ssh-copy-id larry@123.456.78.9
 ```
 <p align="center">**Or if you prefer `scp` command:**<br><br>
 On the VPS create `.ssh` directory and change permissions for it:
@@ -195,7 +195,7 @@ mkdir -p ~/.ssh && sudo chmod -R 700 ~/.ssh/
 ```
 From your local computer:
 ```bash
-scp ~/.ssh/id_rsa.pub example_user@172.16.254.1:~/.ssh/authorized_keys
+scp ~/.ssh/id_rsa.pub example_user@123.456.78.9:~/.ssh/authorized_keys
 ```
 ###To Do:
 <br>
