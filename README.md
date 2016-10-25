@@ -151,7 +151,8 @@ Now you can administer server from your new user account instead of root. If you
 su -
 ```
 Make neccessary changes and then `exit` to become a normal user again.<br>
-Or
+You can also use `sudo` command instead of switching between users:
+
 ```bash
 sudo example-command
 ```
@@ -188,7 +189,7 @@ From your local computer:
 ```bash
 ssh-copy-id larry@123.456.78.9
 ```
-**Or if you prefer `scp` command:**<br><br>
+Or if you prefer `scp` command:<br><br>
 On the VPS create `.ssh` directory and change permissions for it:
 ```bash
 mkdir -p ~/.ssh && sudo chmod -R 700 ~/.ssh/ 
