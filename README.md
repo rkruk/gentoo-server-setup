@@ -245,7 +245,7 @@ After that restart the SSH service to load the new configuration.
 sudo service ssh restart
 ```
 <br>
-**Fail2ban for SSH**<br>
+<p align="center">**Fail2ban for SSH**<br>
 
 Fail2ban is a log-parsing application that monitors system logs for symptoms of an automated attack on your server. When an attempted attack is discovered, Fail2ban will add a new rule to iptables, thus blocking the IP address of the attacker (for a set amount of time or permanently - up to you really).<br>
 
@@ -253,7 +253,7 @@ Install Fail2ban:
 ```bash
 emerge -av net-analyzer/fail2ban net-firewall/iptables
 ```
-<br>
+
 Iptables should be already installed - it is only to make sure that we have it in the system. We'll configure it a bit later.<br><br>
 For now go to `/etc/fail2ban`. Within this directory are all Fail2ban configuration files:<br>
 
@@ -302,7 +302,7 @@ maxretry = 3
 
 `Maxretry` parameter is the amount of incorrect login attempts that a host may have before they get banned for the length of the ban time.<br>
 
-Findtime parameter refers to the amount of time that a host has to log in. The default setting is 10 minutes; this means that if a host attempts, and fails, to log in more than the maxretry number of times in the designated 10 minutes, they will be banned. Sweet - isn't it? :) <br>
+`Findtime` parameter refers to the amount of time that a host has to log in. The default setting is 10 minutes; this means that if a host attempts, and fails, to log in more than the maxretry number of times in the designated 10 minutes, they will be banned. Sweet - isn't it? :) <br>
 <br>
 Now lets check and configure the ssh-iptables section in the `/etc/fail2ban/jail.local` file.<br>
 The SSH details section is by default already set up and turned on. Although you should not be required to make any changes within this section, you can find the details:<br>
