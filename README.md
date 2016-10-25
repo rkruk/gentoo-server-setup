@@ -188,7 +188,7 @@ From your local computer:
 ```bash
 ssh-copy-id larry@123.456.78.9
 ```
-<p align="center">**Or if you prefer `scp` command:**<br><br>
+**Or if you prefer `scp` command:**<br><br>
 On the VPS create `.ssh` directory and change permissions for it:
 ```bash
 mkdir -p ~/.ssh && sudo chmod -R 700 ~/.ssh/ 
@@ -198,7 +198,7 @@ From your local computer:
 scp ~/.ssh/id_rsa.pub larry@123.456.78.9:~/.ssh/authorized_keys
 ```
 <!-- 
-    A bit of security here:
+    A bit of security here and there:
 -->
 For the security reasons I would strongly advise to disallow `root` logins over SSH. All SSH connections will be made by non-root user (larry in this example). Once a limited user account (larry) is connected, administrative privileges are accessible either by using `sudo` or changing to a root shell using `su -` command.<br><br>
 
@@ -221,7 +221,7 @@ change the line `PasswordAuthentication yes` to disable clear text passwords:
 ```bash
 PasswordAuthentication no
 ```
-<br><br>
+<br>
 <b>!!!</b>Though you may want to leave password authentication enabled if you connect to your Linode server from many different computers. This will allow you to authenticate with a password instead of generating and uploading a key-pair for every device.
 <br><br>
 
@@ -243,8 +243,105 @@ After that restart the SSH service to load the new configuration.
 ```bash
 sudo service ssh restart
 ```
+<br>
+**Fail2ban for SSH**<br>
 
+Fail2ban is a log-parsing application that monitors system logs for symptoms of an automated attack on your server. When an attempted attack is discovered, Fail2ban will add a new rule to iptables, thus blocking the IP address of the attacker (for a set amount of time or permanently - up to you really).<br>
 
+Install Fail2ban:
+```bash
+emerge -av net-analyzer/fail2ban net-firewall/iptables
+```
+<br>
+Iptables should be already installed - it is only to make sure that we have it in the system. We'll configure it a bit later.<br><br>
+For now go to `/etc/fail2ban`. Within this directory are all Fail2ban configuration files:<br>
+
+```bash
+cd /etc/fail2ban
+```
+and check configuration files there:
+```bash
+ls -l 
+```
+The default fail2ban configuration file is location at /etc/fail2ban/jail.conf. The configuration work should not be done in that file, however, and we will instead make a local copy of it.<br>
+
+```bash
+cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+```
+
+After the file is copied, you can make all of your changes within the new `jail.local file`. Many of possible services that may need protection are in the file already. Each is located in its own section, configured and turned off by default.<br>
+
+Edit `jail.local` file:<br>
+
+```bash
+nano /etc/fail2ban/jail.local
+```
+The first section of defaults covers the basic rules that fail2ban will follow. If you want to set up more nuanced protection for your virtual private server, you can customize the details in each section.<br>
+Write your personal IP address into the `ignoreip` line. You can separate each address with a space. IgnoreIP allows you white list certain IP addresses and make sure that they are not locked out from your server. Including your address will guarantee that you do not accidentally ban yourself.<br> 
+
+```bash
+[DEFAULT]
+
+# "ignoreip" can be an IP address, a CIDR mask or a DNS host. Fail2ban will not
+# ban a host which matches an address in this list. Several addresses can be
+# defined using space separator.
+ignoreip = 127.0.0.1
+
+# "bantime" is the number of seconds that a host is banned.
+bantime  = 3600
+
+# A host is banned if it has generated "maxretry" during the last "findtime"
+# seconds.
+findtime  = 600
+
+# "maxretry" is the number of failures before a host get banned.
+maxretry = 3
+```
+`Bantime` parameter is the number of seconds that a host would be blocked from the server if they are found to be in violation of any of the rules. This is especially useful in the case of various bots, that once banned, will simply move on to the next target. The default is set for 10 minutes—you may raise this to an hour (3600sec or even higher).<br>
+
+`Maxretry` parameter is the amount of incorrect login attempts that a host may have before they get banned for the length of the ban time.<br>
+
+Findtime parameter refers to the amount of time that a host has to log in. The default setting is 10 minutes; this means that if a host attempts, and fails, to log in more than the maxretry number of times in the designated 10 minutes, they will be banned. Sweet - isn't it? :) <br>
+<br>
+Now lets check and configure the ssh-iptables section in the `/etc/fail2ban/jail.local` file.<br>
+The SSH details section is by default already set up and turned on. Although you should not be required to make any changes within this section, you can find the details:<br>
+
+```bash
+[ssh-iptables]
+
+enabled  = true
+filter   = sshd
+action   = iptables[name=SSH, port=30000, protocol=tcp]
+logpath  = /var/log/secure
+maxretry = 3
+```
+
+enabled - means that SSH protection is on. To turn it off use word: "false".<br>
+filter - is set by default to sshd, and it refers to the config file containing the rules that fail2banuses to find matches.<br>
+action - describes the steps that fail2ban will take to ban a matching IP address.<br>
+
+In the "iptables" parameter's details, you can customize fail2ban a bit further. As we are going to use a non-standard port for ssh connection, we need to set the port number within the brackets to match.<br>
+
+You can change the protocol from TCP to UDP in this line as well, depending on which one you want fail2ban to monitor.<br>
+
+log path - this parameter refers to the log location that fail2ban will use.<br>
+
+max retry - I'm sure I don't need to explain that one- right?<br>
+
+When all changes in the fail2ban configurations are set and saved, there is only one thing left to do. Restart the fail2ban service to catch up with all changes:<br>
+
+```bash
+sudo service fail2ban restart
+```
+
+To check the rules that fail2ban puts in effect within the IP table memorise and use:<br>
+
+```bash
+iptables -L
+```
+
+###########################################################<br>
+###########################################################
 ###To Do:
 <br>
 server configuration, security, software, services,etc...
