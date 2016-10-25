@@ -175,7 +175,7 @@ Minimum key size is 1024 bits, default is 2048 (see `man ssh-keygen`) and maximu
 <p align="center">**(This has to be done on your local computer, not on the VPS !!!)**
 
 <p align="left">We are going to create a 8192-bit RSA key pair here. There are voices in the community that we should use bigger, better, stronger keys. But key is only one small part of the security. And right now, a default 2048-bit RSA key, or any greater length (such as the 4096-bit key size of the Github suggestion), is unbreakable with today's technology and known factorization algorithms. Even with very optimistic assumptions on the future improvements of computational power available for a given price (namely, that Moore's law holds at its peak rate for the next three decades), a 3072-bit RSA key won't become breakable within the next 30 years by Mankind as a whole, let alone by an Earth-based organization. Of course, there always remains the possibility of some unforeseen mathematical breakthrough that makes breaking RSA keys a lot easier. Unforeseen breakthroughs are, by definition, unpredictable, so any debate on that subject is by nature highly speculative.<br>If you need more security than default RSA-2048 offers, the way to go would be to switch to elliptical curve cryptography (ed25519)<br>
-<!-- EDITION DONE TO THIS LINE 
+<!--
      SSH part needs to be revised!
 -->
 During creation of the key, you will be given the option to encrypt the private key with a passphrase. This means that key cannot be used without entering the passphrase. I suggest to use the key pair with a passphrase.
@@ -195,8 +195,56 @@ mkdir -p ~/.ssh && sudo chmod -R 700 ~/.ssh/
 ```
 From your local computer:
 ```bash
-scp ~/.ssh/id_rsa.pub example_user@123.456.78.9:~/.ssh/authorized_keys
+scp ~/.ssh/id_rsa.pub larry@123.456.78.9:~/.ssh/authorized_keys
 ```
+<!-- 
+    A bit of security here:
+-->
+For the security reasons I would strongly advise to disallow `root` logins over SSH. All SSH connections will be made by non-root user (larry in this example). Once a limited user account (larry) is connected, administrative privileges are accessible either by using `sudo` or changing to a root shell using `su -` command.<br><br>
+
+Lets edit a `/etc/ssh/sshd_config` file: 
+```bash
+nano /etc/ssh/sshd_config
+```
+and change `yes` to `no` in the `PermitRootLogin` line:<br>
+```bash
+# Authentication:
+...
+PermitRootLogin no
+```
+<br><br>
+As we are going to use only key based authentication I recommend to disable SSH password authentication. This will require for all users allowed to connect via SSH to use key authentication only. Edit the same file:  
+```bash
+nano /etc/ssh/sshd_config
+```
+change the line `PasswordAuthentication yes` to disable clear text passwords:
+```bash
+PasswordAuthentication no
+```
+<br><br>
+<b>!!!</b>Though you may want to leave password authentication enabled if you connect to your Linode server from many different computers. This will allow you to authenticate with a password instead of generating and uploading a key-pair for every device.
+<br><br>
+
+Continue with another flags for ssh in the `/etc/ssh/sshd_config` file.<br> 
+Specify to listen on only one internet protocol. The SSH daemon listens for incoming connections over both IPv4 and IPv6 by default. Unless you need to SSH into your Linode using both protocols, disable whichever you do not need. This does not disable the protocol system-wide, it is only for the SSH daemon.<br><br>
+
+Add this option as `AddressFamily` is usually  not in the `/etc/ssh/sshd_config` file by default. AddressFamily `inet` to listen only on IPv4 or `AddressFamily inet6` to listen only on IPv6.<br>
+Change accordingly to yours needs:
+```bash
+echo 'AddressFamily inet' | sudo tee -a /etc/ssh/sshd_config
+```
+or
+```bash
+echo 'AddressFamily inet6' | sudo tee -a /etc/ssh/sshd_config
+```
+<br><br>
+After that restart the SSH service to load the new configuration.
+
+```bash
+sudo service ssh restart
+```
+
+
 ###To Do:
 <br>
 server configuration, security, software, services,etc...
