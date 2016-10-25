@@ -38,8 +38,9 @@ Same thing is with all log damemons, web servers, firewalls, etc.. Yes, you can 
 <p align="left">I won't cover here installation process - Linode will roll it out for you automatically with the help of their installation scripts - just do some magic with with help of your mouse and keyboard. It is straightforward process and it is extremely easy. Otherwise install it on your own with the use of one of the best documentations written ever (just right after *BSD documentation) at the <a href="https://www.gentoo.org/">gentoo.org</a> website.
 <br>
 <br>
-<p align="center">*** 
-<p align="center">**First Steps**<br>
+<p align="center">****
+<p align="center">**First Steps**
+
 <p align="left">*I assume that you already installed your Gentoo based system and you know how to connect through SSH onto it. Your server should be up and running already of course.*
 <br>
 <p align="left">Lets start and log in to our new server through the SSH. Enter the following into your terminal window or application (putty --> if you are using silly Windows based OS :/ ). Be sure to replace the example IP address with your server IP address (Linode users: you can find it in the &#8594; 'Linodes' tab &#8594; 'Remote Access' tab). As a example here I'll use IP: 123.456.78.9 address:<br>
@@ -259,7 +260,7 @@ sudo service ssh restart
 
 Fail2ban is a log-parsing application that monitors system logs for symptoms of an automated attack on your server. When an attempted attack is discovered, Fail2ban will add a new rule to iptables, thus blocking the IP address of the attacker (for a set amount of time or permanently - up to you really).<br>
 
-Install Fail2ban:
+Install Fail2ban and iptables:
 ```bash
 emerge -av net-analyzer/fail2ban net-firewall/iptables
 ```
@@ -344,12 +345,17 @@ When all changes in the fail2ban configurations are set and saved, there is only
 ```bash
 sudo service fail2ban restart
 ```
+<br><br>
+<p align="center">***
+<p align="center">**IPTABLES:**
+<br>
 
-To check the rules that fail2ban puts in effect within the IP table memorise and use following command:<br>
+To check the rules that fail2ban puts in effect within the IP table religiously memorise and use following command:<br>
 
 ```bash
 iptables -L
 ```
+
 Iptables is the controller for netfilter, the Linux kernel’s packet filtering framework. Iptables is included in most Linux distributions by default but is considered an advanced method of firewall control.<br>
 
 Appropriate firewall rules depend on the services being run. Below are iptables rulesets to secure your web server.<br>
@@ -473,8 +479,10 @@ I know that we've barely scratched the surface with securing this tiny fluffy se
 
 Lets install some basic services for hosting websites, irc and git. As we are focusing on keeping it speed and secure there is no place for databases or things like php nasty bloat.
 <br><br>
-<p align="center">*** 
-<p align="center">** Web Server**<br>
+<p align="center">***
+<p align="center">**Web Server:**
+<br>
+
 <p align="left">While I am not aware of any Gentoo specific benchmarks that have been run on the various flavors of web servers, it is typically logical to assume that the more feature-enabled the version of web server you use, the more resources it would use.<br>
 Though Nginx is better in the raw number of requests per second it can serve than Apache or Lighttpd. At higher levels of concurrency, it can handle fewer requests per second, but still can serve double what Lighttpd does (which is already doing nearly 4x what Apache was ever able to do).<br>
 <p align="center">![Gentoo](https://github.com/rkruk/gentoo-server-setup/blob/master/Webserver_requests_graph.jpg)<br>
