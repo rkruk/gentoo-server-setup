@@ -238,6 +238,9 @@ or
 ```bash
 echo 'AddressFamily inet6' | sudo tee -a /etc/ssh/sshd_config
 ```
+<!-- 
+   ADD something more about ssh ports!
+-->
 Finally change ssh port from default 22 to something different:<br>
 ```bash
 # What ports, IPs and protocols we listen for
