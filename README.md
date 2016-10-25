@@ -238,6 +238,12 @@ or
 ```bash
 echo 'AddressFamily inet6' | sudo tee -a /etc/ssh/sshd_config
 ```
+Finally change ssh port from default 22 to something different:<br>
+```bash
+# What ports, IPs and protocols we listen for
+Port 3000
+```
+In this example I'm going to use port 3000 for all ssh connections.
 <br><br>
 After that restart the SSH service to load the new configuration.
 
@@ -313,7 +319,7 @@ The SSH details section is by default already set up and turned on. Although you
 
 enabled  = true
 filter   = sshd
-action   = iptables[name=SSH, port=30000, protocol=tcp]
+action   = iptables[name=SSH, port=3000, protocol=tcp]
 logpath  = /var/log/secure
 maxretry = 3
 ```
