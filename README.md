@@ -245,6 +245,7 @@ After that restart the SSH service to load the new configuration.
 sudo service ssh restart
 ```
 <br>
+<p align="center">***
 <p align="center">**Fail2ban for SSH**<br>
 
 Fail2ban is a log-parsing application that monitors system logs for symptoms of an automated attack on your server. When an attempted attack is discovered, Fail2ban will add a new rule to iptables, thus blocking the IP address of the attacker (for a set amount of time or permanently - up to you really).<br>
