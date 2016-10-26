@@ -416,7 +416,7 @@ Paste the following into `/etc/iptables.firewall.rules`:
 COMMIT
 ```
 Yep. Rule `-A INPUT -p tcp -m set --match-set china src -j DROP` is a brilliant thing. Nothing personal guys.<br>
-I was tired of all awkward traffic from china. Actually none of all websites I'm hosting is directed for that region. I'm even thinking to extend it a bit for Russia and Ukraine  as well. The amount of sniffers, bots and bad IPs from China, Russia, Ukraine and Romania is teryfying. Hundreds to thousands daily.. :/ For a small servers bots trying to get in through the ssh port:22 every 3 seconds or sniffers looking for security hole in particular software (mysql and php related usually) it is nuisance and waste of computing resources.<br>
+I was tired of all awkward traffic from china. Actually not even a single website I'm hosting is directed for that region. I'm even thinking to extend it a bit for Russia and Ukraine  as well. Websites I'm hosting usually if not always are for local makrket or a single country only. Nothing 'THAT BIG' for a global reach or something like that (lets be serious though - this is one small VPS). The amount of sniffers, bots and bad IPs from China, Russia, Ukraine and Romania is teryfying. Hundreds to thousands daily.. :/ For a small servers bots trying to get in through the ssh port:22 every 3 seconds or sniffers looking for security hole in particular software (mysql and php related usually) it is nuisance and waste of computing resources.<br>
 
 Lets build those rules now.<br>
 
