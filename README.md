@@ -453,6 +453,7 @@ Inside of that file put:
 #!/bin/sh
 /sbin/iptables-restore < /etc/iptables.firewall.rules
 ```
+
 <!-- TODO: That is not working yet!
      RULES won't restore back - this method require manual restore somehow :/ 
 -->
@@ -463,19 +464,27 @@ Set the script permissions:
 sudo chmod +x /etc/network-iptables-rules
 ```
 
+Restore those rules to make them filter all network traffic:
+
+```bash
+iptables-restore < /etc/iptables.firewall.rules
+```
+
 Verify that the rules were installed correctly:
 
 ```bash
 sudo iptables -vL
 ```
-If you are working with IPv6 protocol just repeat process for ip6tables same as shown above. The only difference will be usage of `ip6tables` instead of `iptables`.
+
+If you are using IPv6 protocol just repeat process for ip6tables same as shown above. The only difference will be usage of `ip6tables` instead of `iptables`.
 
 Save all iptables rules for now:
 
 ```bash
 service iptables save
 ```
-I know that we've barely scratched the surface with securing this tiny fluffy server. But it is good enough for now (cough! cough!..). I will cover security topic at the end of this documentation (when all services are set, tested and running).<br>
+
+I know that we have barely scratched the surface with securing this tiny fluffy server. But it is good enough for now (cough! cough!..). I will cover security topic at the end of this documentation (when all services are set, tested and running). <br>
 
 Lets install some basic services for hosting websites, irc and git. As we are focusing on keeping it speed and secure there is no place for databases or things like php nasty bloat.
 <br><br>
