@@ -492,10 +492,439 @@ Lets install some basic services for hosting websites, irc and git. As we are fo
 <p align="center">**Web Server:**
 <br>
 
-<p align="left">While I am not aware of any Gentoo specific benchmarks that have been run on the various flavors of web servers, it is typically logical to assume that the more feature-enabled version of web server you use, the more resources it would use.<br>
-According to documentations I compared and readed carefully - NGINX web server is better in the 'raw number of requests per second it can serve' than Apache or Lighttpd servers. At higher levels of concurrency, NGINX can handle fewer requests per second, but still can serve double what Lighttpd does (which is already doing nearly 4x what Apache was ever able to do).<br>
+<p align="left">While I am not aware of any Gentoo specific benchmarks that have been run on the various flavors of web servers, it is typically logical to assume that the more feature-enabled by default web server you install, the more resources it would use.<br>
+I spent a lot of time reading various documentations and comparing all informations carefully. I also had in the past my ups and downs with Apache, I did some trials with Lighttpd, etc.. Long story short NGINX web server is better in the 'raw number of requests per second it can serve' than Apache or Lighttpd servers no matter how well configured they are. At higher levels of concurrency, NGINX can handle fewer requests per second, but still can serve double what Lighttpd does (which is already doing nearly 4x what Apache was ever able to do).<br>
 <p align="center">![Gentoo](https://github.com/rkruk/gentoo-server-setup/blob/master/Webserver_requests_graph.jpg)<br>
-<p align="left">Though Apache supports a larger toolbox of things it can do immediately after install, yet it can be something of a memory hog with all modules enabled by default. Contrary freshly installed NGINX does not eat as much memory compared to Apache (even with enabled additional modules is still faster and scale better).<br><br>
+<p align="left">Though Apache supports a larger toolbox of things it can do immediately after install, yet it can be something of a memory hog with all modules enabled by default. Contrary freshly installed NGINX does not eat as much memory compared to Apache (even with enabled additional modules is still faster and scale way better).<br><br>
+I should also mention that nginx is a also good as a reverse proxy server!<br><br>
+
+Before we go with installation of nginx package, first we should do some magic with the USE flags for Nginx.<br>
+There are two ways of handling USE flags:<br><br>
+-Global (via /etc/portage/make.conf file - more information <a href="https://wiki.gentoo.org/wiki//etc/portage/make.conf">here</a>)<br>
+-Local (via /etc/portage/package.use - more <a target="_blank" href="https://wiki.gentoo.org/wiki//etc/portage/package.use">here</a>)
+<br><br>
+Nginx uses modules to enhance its features. It uses expanded USE (USE_EXPAND) flags to denote which modules should be installed:<br>
+-HTTP related modules can be enabled through the NGINX_MODULES_HTTP variable<br>
+-Mail related modules can be enabled through the NGINX_MODULES_MAIL variable<br>
+-Third party modules can be enabled through the NGINX_ADD_MODULES variable<br>
+<br>
+These variables need to be set in /etc/portage/make.conf. Modules detailed descriptions can be found in these directories:<br> `/usr/portage/profiles/desc/nginx_modules_http.desc`<br> 
+and<br> 
+`/usr/portage/profiles/desc/nginx_modules_mail.desc.`
+<br><br>
+For example, to enable the spdy module:<br>
+Edit `/etc/portage/make.conf` and add:
+```bash
+NGINX_MODULES_HTTP="spdy"
+```
+That will overwrite the default value of NGINX_MODULES_HTTP and set it to spdy. To enable the spdy without overwriting the default NGINX_MODULES_HTTP, use local USE flag which can be specified in `/etc/portage/package.use`:<br>
+```bash
+www-servers/nginx NGINX_MODULES_HTTP: spdy
+```
+You definitely should check the complete list of USE flags specified for <a href="https://packages.gentoo.org/packages/www-servers/nginx">www-servers/nginx</a> package.<br>
+Ask what flags nginx have enabled by default:
+```bash
+equery uses nginx
+```
+And change flags accordingly to your needs in the `/etc/portage/make.conf`. For example:<br>
+```bash
+USE="aio http http-cache http2 ipv6 pcre poll select ssl threads -cpp_test -debug -google_perftools"
+NGINX_MODULES_HTTP="autoindex browser charset empty_gif geo gzip limit_conn limit_req map proxy referer rewrite scgi split_clients ssi upstream_hash upstream_ip_hash upstream_keepalive upstream_least_conn upstream_zone userid uwsgi geoip gunzip gzip_static image_filter realip"
+NGINX_MODULES_MAIL="-imap -pop3 -smtp"
+```
+<br>
+With all USE flags set, lets install www-servers/nginx:
+```bash
+emerge --ask www-servers/nginx
+```
+The nginx package will install an init service script allowing you to stop, start, or restart the service.<br> 
+For example to start the nginx service do:
+```bash
+/etc/init.d/nginx start
+```
+The main nginx configuration is handled through the `/etc/nginx/nginx.conf` file:<br>
+```bash
+user nginx nginx;
+worker_processes 1;
+
+error_log /var/log/nginx/error_log info;
+
+events {
+        worker_connections 1024;
+        use epoll;
+        # for a worker to accept all new connections at one time:
+        multi_accept on;
+}
+
+http {
+        ### Cloudflare Real IP:
+        # I know what people talking about some particular companies ;)
+        # I also know that Cloudflare is blocking TOR nodes - which is a terrible idea. 
+        # People also are a bit worried about their FlexibleSSL which I'm not recommending (use fullSSL or Let’s Encrypt SSL). 
+        # To be honest - their DNS package is quite nice for me. They even offer some candy there: 
+        # CDN, statistics (not great but always something), free SSL for my small websites, and some
+        # sort protection agains DDOS. And it is dead easy to set up quickly. Not a Cloudflare user? You can skip this part:
+        set_real_ip_from   204.93.240.0/24;
+        set_real_ip_from   204.93.177.0/24;
+        set_real_ip_from   199.27.128.0/21;
+        set_real_ip_from   173.245.48.0/20;
+        set_real_ip_from   103.22.200.0/22;
+        set_real_ip_from   141.101.64.0/18;
+        set_real_ip_from   108.162.192.0/18;
+        set_real_ip_from   103.21.244.0/22;
+        set_real_ip_from   103.31.4.0/22;
+        set_real_ip_from   104.16.0.0/12;
+        set_real_ip_from   131.0.72.0/22;
+        set_real_ip_from   162.158.0.0/15;
+        set_real_ip_from   172.64.0.0/13;
+        set_real_ip_from   188.114.96.0/20;
+        set_real_ip_from   190.93.240.0/20;
+        set_real_ip_from   197.234.240.0/22;
+        set_real_ip_from   198.41.128.0/17;
+        # IPV6 Cloudflare IP:
+        set_real_ip_from   2400:cb00::/32;
+        set_real_ip_from   2405:8100::/32;
+        set_real_ip_from   2405:b500::/32;
+        set_real_ip_from   2606:4700::/32;
+        set_real_ip_from   2803:f800::/32;
+        real_ip_header     CF-Connecting-IP;
+        ### End of Cloudflare Real IP list ###
+
+        ### My little experiment with GeoIP.
+        # The list is long as I don't believe in global reach for my small websites I'm hosting on this particular VPS. 
+        # Viewer's audience is targeted here for a few countries only. I'm hoping also to cut the drama with spammers, 
+        # and others not so happy folks on the internet.
+        #
+        geoip_city    /etc/nginx/geoip/GeoLiteCity.dat;
+        geoip_country /usr/share/GeoIP/GeoIP.dat;
+        map $geoip_country_code $allowed_country {
+                default yes;
+                # Block those countries:
+                AD no;
+                AE no;
+                AF no;
+                AG no;
+                AI no;
+                AL no;
+                AM no;
+                AO no;
+                AP no;
+                AR no;
+                AS no;
+                AW no;
+                AX no;
+                AZ no;
+                BA no;
+                BB no;
+                BD no;
+                BF no;
+                BG no;
+                BH no;
+                BI no;
+                BJ no;
+                BL no;
+                BM no;
+                BN no;
+                BO no;
+                BQ no;
+                BR no;
+                BS no;
+                BT no;
+                BV no;
+                BW no;
+                BY no;
+                BZ no;
+                CC no;
+                CD no;
+                CF no;
+                CG no;
+                CI no;
+                CK no;
+                CL no;
+                CM no;
+                CN no;
+                CO no;
+                CR no;
+                CU no;
+                CV no;
+                CW no;
+                CX no;
+                CY no;
+                DJ no;
+                DK no;
+                DM no;
+                DO no;
+                DZ no;
+                EC no;
+                EE no;
+                EG no;
+                EH no;
+                ER no;
+                ET no;
+                FI no;
+                FJ no;
+                FK no;
+                FM no;
+                GA no;
+                GD no;
+                GE no;
+                GF no;
+                GG no;
+                GH no;
+                GI no;
+                GM no;
+                GN no;
+                GP no;
+                GQ no;
+                GR no;
+                GS no;
+                GT no;
+                GU no;
+                GW no;
+                GY no;
+                HK no;
+                HM no;
+                HN no;
+                HR no;
+                HT no;
+                HU no;
+                ID no;
+                IN no;
+                IO no;
+                IQ no;
+                IR no;
+                JM no;
+                JO no;
+                JP no;
+                KE no;
+                KG no;
+                KH no;
+                KI no;
+                KM no;
+                KN no;
+                KP no;
+                KR no;
+                KW no;
+                KZ no;
+                LA no;
+                LB no;
+                LC no;
+                LK no;
+                LR no;
+                LS no;
+                LT no;
+                LV no;
+                LY no;
+                MA no;
+                MD no;
+                MG no;
+                MK no;
+                ML no;
+                MM no;
+                MN no;
+                MQ no;
+                MR no;
+                MT no;
+                MU no;
+                MV no;
+                MW no;
+                MX no;
+                MY no;
+                MZ no;
+                NA no;
+                NC no;
+                NE no;
+                NG no;
+                NI no;
+                NP no;
+                NR no;
+                NU no;
+                NZ no;
+                OM no;
+                PA no;
+                PE no;
+                PF no;
+                PG no;
+                PH no;
+                PK no;
+                PM no;
+                PN no;
+                PR no;
+                PS no;
+                PT no;
+                PW no;
+                PY no;
+                QA no;
+                RE no;
+                RO no;
+                RS no;
+                RU no;
+                RW no;
+                SA no;
+                SB no;
+                SC no;
+                SD no;
+                SG no;
+                SI no;
+                SJ no;
+                SL no;
+                SN no;
+                SO no;
+                SR no;
+                SS no;
+                ST no;
+                SV no;
+                SY no;
+                SZ no;
+                TC no;
+                TD no;
+                TG no;
+                TH no;
+                TJ no;
+                TK no;
+                TL no;
+                TM no;
+                TN no;
+                TO no;
+                TR no;
+                TT no;
+                TV no;
+                TW no;
+                TZ no;
+                UA no;
+                UG no;
+                UY no;
+                UZ no;
+                VC no;
+                VE no;
+                VG no;
+                VI no;
+                VN no;
+                VU no;
+                WF no;
+                WS no;
+                YE no;
+                YT no;
+                ZA no;
+                ZM no;
+                ZW no;
+        }
+        # geo $exclusions {
+        # default 0;
+        # 10.8.0.0/24 1;
+        # }
+        #
+        # About those Geoip settings - I'm not sure if that thing is working at all :/
+        # I'll definitely look closer at this when I have a time for that.
+
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+
+        log_format main
+                '$remote_addr - $remote_user [$time_local] '
+                '"$request" $status $bytes_sent '
+                '"$http_referer" "$http_user_agent" '
+                '"$gzip_ratio"';
+
+        # client_body_buffer_size handles the client buffer size.
+        # Most client buffers are coming from POST method form submissions.
+        # 128k is normally a good choice for this setting.
+        # A bit overkill I know..
+        # If you are preparing yourself for buffer overflows scenario set it up to: 1k.
+        # As I'm serving it through the Cloudflare networked proxy:
+        client_body_buffer_size      128k;
+
+        # client_max_body_size sets the max body buffer size.
+        # If the size in a request exceeds the configured value,
+        # the 413 (Request Entity Too Large) error is returned to the client.
+        # For reference, browsers cannot correctly display 413 errors.
+        # Setting size to 0 disables checking of client request body size.
+        # I could go for 1k here but lets try for a bit 10m:
+        client_max_body_size         10m;
+
+        # client_header_buffer_size handles the client header size.
+        # 1k is usually a sane choice for this by default.
+        client_header_buffer_size    1k;
+
+        # large_client_header_buffers shows the maximum number and size of
+        # buffers for large client headers. 4 headers with 4k buffers should be sufficient here.
+        large_client_header_buffers  4 4k;
+
+        # output_buffers sets the number and size of the buffers used for reading a response from a disk.
+        # If possible, the transmission of client data will be postponed until Nginx has at least the
+        # set size of bytes of data to send. The zero value disables postponing data transmission.
+        output_buffers               1 32k;
+        postpone_output              1460;
+
+        # client_header_timeout sends directives for the time a server will wait for a header body to be sent.
+        client_header_timeout 3m;
+
+        # client_body_timeout sends directives for the time a server will wait for a body to be sent.
+        client_body_timeout 3m;
+
+        # sent_timeout specifies the response timeout to the client.
+        # This timeout does not apply to the entire transfer but, rather,
+        # only between two subsequent client-read operations. Thus, if
+        # the client has not read any data for this amount of time, then Nginx shuts down the connection.
+        send_timeout 3m;
+
+        # configuration block tells Nginx to cache 1000 files for 30 seconds,
+        # excluding any files that haven't been accessed in 20 seconds, and only files that have 5 times or more.
+        open_file_cache max=1000 inactive=20s;
+        open_file_cache_valid 30s;
+        open_file_cache_min_uses 5;
+        open_file_cache_errors off;
+
+        # cache via a particular location <-- pushed to: /sites-available/*conf:
+        #location ~* .(woff|eot|ttf|svg|mp4|webm|jpg|jpeg|png|gif|ico|css|js)$ {
+        #    expires 365d;
+        #    }
+
+        connection_pool_size 256;
+        request_pool_size 4k;
+
+        # disable sending the nginx version number in error pages and Server header:
+        server_tokens off;
+
+        # Gzip settings:
+        gzip on;
+        gzip_disable "MSIE [1-6]\.";
+        gzip_vary on;
+        gzip_proxied any;
+        gzip_comp_level 6;
+        gzip_buffers 16 8k;
+        gzip_http_version 1.1;
+        gzip_min_length 256;
+        gzip_types application/x-javascript text/css application/javascript text/javascript text/plain text/xml application/json application/vnd.ms-fontobject application/x-font-opentype application/x-font-truetype application/x-font-ttf application/xml font/eot font/opentype font/otf image/svg+xml image/vnd.microsoft.icon image/x-icon;
+
+        gzip_proxied  expired no-cache no-store private auth;
+        # End of gzip settings
+
+        # sendfile optimizes serving static files from the file system, like logos:
+        sendfile on;
+
+        # tcp_nopush optimizes the amount of data sent down the wire at once by activating
+        # the TCP_CORK option within the TCP stack. TCP_CORK blocks the data until the packet
+        # reaches the MSS, which is equal to the MTU minus the 40 or 60 bytes of the IP header.
+        tcp_nopush on;
+
+        # tcp_nodelay allows Nginx to make TCP send multiple buffers as individual packets:
+        tcp_nodelay on;
+
+        # Keep alive allows for fewer reconnections from the browser:
+        keepalive_timeout 75 20;
+        keepalive_requests 100000;
+
+        ignore_invalid_headers on;
+
+        index index.htmL;
+
+        include /etc/nginx/sites-enabled/*.conf;
+}
+```
+<br>
+The best way of setting a proper configuration for particular website is to make a separate configuration in the `/etc/nginx/sites-available/*.conf` and link it later to the `/etc/nginx/sites-enabled/*.conf` directory. I'll get to that part later.<br><br>
+
 <b>TO DO:</b>
 <br>
 - [ ] services,
