@@ -947,7 +947,7 @@ http {
 <br>
 Inside of `nginx.conf` there are a few things we need to cover now before anything else. There is a GeoIP module to install and set up. The <a target="_blank" href="http://dev.maxmind.com/geoip/geoip2/geolite2/">GeoLite</a> databases are distributed under the Creative Commons Attribution-ShareAlike 4.0 International License by <a target="_blank" href="http://www.maxmind.com">http://www.maxmind.com</a>.
 ```bash
-emerge -Ss sys-process/cronie dev-libs/geoip net-misc/geoipupdate
+emerge -Ss sys-process/dcron dev-libs/geoip net-misc/geoipupdate
 ```
 This will install "geoiplookup" and "geoipupdate" to update the database.<br>
 As the geoiplookup database will be pretty outdated you might want to update it regularly as IP assignment changes. One way of doing that is to use a crontab. Get database:
@@ -964,10 +964,10 @@ Inside of that file put that script:
 wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz -O - | gunzip > /usr/share/GeoIP/GeoCity.dat.new && mv /usr/share/GeoIP/GeoCity.dat.new /usr/share/GeoIP/GeoCity.dat
 wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz -O - | gunzip > /usr/share/GeoIP/GeoIP.dat.new && mv /usr/share/GeoIP/GeoIP.dat.new /usr/share/GeoIP/GeoIP.dat
 ```
-Now we can start our freshly installed `cronie`:
+Now we can start our freshly installed `dcron`:
 ```bash
-/etc/init.d/cronie start
-rc-update add cronie default
+/etc/init.d/dcron start
+rc-update add dcron default
 ```
 GeoIP is set and running. Now 
 More informations about those databases are <a target="_blank" href="http://dev.maxmind.com/geoip/legacy/geolite/">here</a>.
