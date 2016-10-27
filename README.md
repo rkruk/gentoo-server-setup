@@ -1074,10 +1074,15 @@ types {
     video/x-msvideo                       avi;
 }
 ```
+
 <br>
 That was the neccessary basics to do with core nginx. It is time to set up a website configuration.<br>
 The best way of setting a proper configuration for particular website is to make a separate configuration in the `/etc/nginx/sites-available/*.conf` and link it later to the `/etc/nginx/sites-enabled/*.conf` directory. I'll get to that part later. For now go and edit `/etc/nginx/sites-available/example.conf` (change 'example' and use your own domain name here).<br><br>
 
+```bash
+nano /etc/nginx/sites-available/example.conf
+```
+<br>
 <b>TO DO:</b>
 <br>
 - [ ] services,
