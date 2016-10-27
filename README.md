@@ -1082,8 +1082,8 @@ The best way of set up a proper configuration for particular website is to make 
 ```bash
 nano /etc/nginx/sites-available/example.conf
 ```
-Inside of that file we need to put a lot of informations. You can keep it minimal too, but in that example I'll show you my two 'optimal' configurations here.<br>
-<b>VERSION 1:</b> 
+Inside of that file we need to put a lot of informations. Remember that we are going for a performance savy configuration here. In examples below I'll show you my 'optimal' configurations for various websites I'm hosting.<br><br>
+<p align="center"><b>VERSION 1:</b><br> 
 ```bash
 # www to no www:
 server {
@@ -1233,8 +1233,9 @@ server {
        return 301 https://example.com$request_uri;
 }
 ```
-Big isn't it? Let's try something smaller at first now:<br>
-<b>VERSION 2</b>(recommended):
+<br>
+Big isn't it? Let's try something smaller at the beginning (you can extend it later):<br><br>
+<p align="center"><b>VERSION 2</b>(recommended):<br>
 ```bash
 server {
     listen 80;
@@ -1284,7 +1285,25 @@ server {
     }
 }
 ```
+<br>
+Start with the 'version 2' and configure it carefully while testing constantly to the 'version 1' 
 <br><br>
+When your `example.conf` is done and save - it is time to link it to the `/etc/nginx/sites-enabled` directory.<br>
+
+```bash
+ln -s /etc/nginx/sites-available/example.conf /etc/nginx/sites-enabled/aaaexample.conf
+```
+Above I've wrote `aaaexample.conf` to set which websites is set as the first and main for nginx server. There is no logic behind that you can name it as you want as long as you know what you are doing.<br><br>
+
+All is set and in place (probably). Lets test it:<br>
+```bash
+nginx -t
+```
+Eliminate all errors from your configs. run `nginx -t` to the moment you have good working setup.<br> 
+And push it online:<br>
+```bash
+service nginx start
+```
 
 <b>TO DO:</b>
 <br>
