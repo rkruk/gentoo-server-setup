@@ -1076,13 +1076,216 @@ types {
 ```
 
 <br>
-That was the neccessary basics to do with core nginx. It is time to set up a website configuration.<br>
-The best way of setting a proper configuration for particular website is to make a separate configuration in the `/etc/nginx/sites-available/*.conf` and link it later to the `/etc/nginx/sites-enabled/*.conf` directory. I'll get to that part later. For now go and edit `/etc/nginx/sites-available/example.conf` (change 'example' and use your own domain name here).<br><br>
+That was the neccessary basics to do with the nginx core settings. It is time to set up a website configuration. :D<br>
+The best way of set up a proper configuration for particular website is to make a separate configuration in the `/etc/nginx/sites-available/*.conf` for each website you host (thanks me later for that) and link it to the `/etc/nginx/sites-enabled/*.conf` directory. But for now go and edit `/etc/nginx/sites-available/example.conf` (change 'example' and use your own domain name here to know what is where later).<br><br>
 
 ```bash
 nano /etc/nginx/sites-available/example.conf
 ```
-<br>
+Inside of that file we need to put a lot of informations. You can keep it minimal too, but in that example I'll show you my two 'optimal' configurations here.<br>
+<b>VERSION 1:</b> 
+```bash
+# www to no www:
+server {
+       listen 80;
+       server_name www.example.com;
+       return 301 $scheme://example.com$request_uri;
+}
+
+# no www
+server {
+       # Listen on both IPv4 and IPv6
+       listen 443 ssl; # default deferred;
+       listen [::]:443 ipv6only=on ssl; # default deferred;
+
+       server_name example.com;
+
+       # Hide nginx version:
+       server_tokens off;
+
+       # SSL Cert location:
+       ssl_certificate /etc/nginx/ssl/example.com.pem;
+       # example.com.pem - KEY -important as hell!
+       ssl_certificate_key /etc/nginx/ssl/example.com.key;
+
+       # enable session resumption to improve https performance
+       # http://vincent.bernat.im/en/blog/2011-ssl-session-reuse-rfc5077.html
+       ssl_session_cache shared:SSL:50m;
+       ssl_session_timeout 5m;
+
+       # Diffie-Hellman parameter for DHE ciphersuites, recommended 2048 bits
+       ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+
+       # enables server-side protection from BEAST attacks
+       # http://blog.ivanristic.com/2013/09/is-beast-still-a-threat.html
+       ssl_prefer_server_ciphers on;
+
+       # disable SSLv3(enabled by default since nginx 0.8.19) since it's less secure then TLS
+       # http://en.wikipedia.org/wiki/Secure_Sockets_Layer#SSL_3.0
+       ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+
+       # ciphers chosen for forward secrecy and compatibility
+       # http://blog.ivanristic.com/2013/08/configuring-apache-nginx-and-openssl-for-forward-secrecy.html
+       ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES12$
+
+       # enable ocsp stapling (mechanism by which a site can convey certificate revocation information to visitors in a 
+       # privacy-preserving, scalable manner)
+       # --> http://blog.mozilla.org/security/2013/07/29/ocsp-stapling-in-firefox/
+
+       # SSL Stapling(Doesn't work on cloudflare SSl Cert (no CA Cert Available)):
+       # ssl_trusted_certificate /etc/nginx/ssl/..??;
+       # resolver 8.8.8.8;
+       # ssl_stapling on;
+       # ssl_stapling_verify on;
+
+       # config to enable HSTS(HTTP Strict Transport Security) 
+       # --> https://developer.mozilla.org/en-US/docs/Security/HTTP_Strict_Transport_Security
+       # to avoid ssl stripping https://en.wikipedia.org/wiki/SSL_stripping#SSL_stripping
+       add_header Strict-Transport-Security "max-age=31536000; includeSubdomains;";
+
+       # And here is the rest of the configuration.
+       # Change this location accordingly to the location where you keep your website:
+       root /home/user/website/example;
+
+       index index.html index.htm;
+
+       # Disable unwanted HTTP Methods:
+       if ($request_method !~ ^(GET|HEAD|POST)$) {
+          return 444;
+          }
+
+       # GeoIP
+       if ($allowed_country = no) {
+            return 444;
+        }
+       # End of GeoIP
+
+       charset utf-8;
+
+       # Only Cloudflare traffic through nginx:
+       location / {
+          index index.html index.htm;
+          try_files $uri $uri/ /index.html;
+          autoindex on;
+          }
+
+       gzip on;
+       gzip_min_length 1000;
+       gzip_proxied  expired no-cache no-store private auth;
+       gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+       error_page 404 /404.html;
+
+       access_log /var/log/nginx/localhost.access_log main;
+       error_log /var/log/nginx/error_log info;
+
+       location /404.html {
+          # Change it accordingly to the location of website files:
+          root /home/user/website/example;
+          }
+
+       # Deny access to .htaccess
+       location ~ /\.ht {
+          deny all;
+          return 404;
+          }
+
+       location ~* \.html$ {
+          expires -1;
+          }
+
+       location ~*  \.(jpg|jpeg|png|gif|ico|css|js|xml)$ {
+          access_log off;
+          log_not_found off;
+          expires 30d;
+          add_header Pragma public;
+          add_header Cache-Control "public, must-revalidate, proxy-revalidate";
+        }
+
+       # Image hotlinking protection:
+       location ~ \.(jpg|jpeg|png|gif|ico|jpe?g)$ {
+          valid_referers none blocked example.com *.example.com;
+          if ($invalid_referer) {
+             return   403;
+          }
+         } 
+
+       location ~* \.(gif|jpg|jpeg|png|wmv|ico|avi|mpg|mpeg|mp4|htm|html|js|css)$ {
+         valid_referers none blocked example.com www.example.com ~\.google\. ~\.yahoo\. ~\.bing\. ~\.facebook\. ~\.fbcdn\.;
+           if ($invalid_referer) {
+               return 403;
+                 }
+       }
+
+       # Cache settings for static files directory:
+       location ~* /images/.+\.[0-9a-f][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]\. {
+       expires max;
+       }
+}
+
+# no www to https
+# redirect all http traffic to https
+server {
+       # Listen on both IPv4 and IPv6
+       listen 80;
+       listen [::]:80 ipv6only=on;
+       server_name example.com;
+       return 301 https://example.com$request_uri;
+}
+```
+Big isn't it? Let's try something smaller at first now:<br>
+<b>VERSION 2</b>(recommended):
+```bash
+server {
+    listen 80;
+    server_name www.example.com;
+    return 301 $scheme://example.com$request_uri;
+    }
+
+server {
+    listen 80;
+    server_name example.com;
+
+    root /home/user/website/example;
+
+    index index.html index.htm;
+
+    charset utf-8;
+
+    location / {
+      index index.html index.htm;
+      autoindex on;
+    }
+
+    gzip on;
+    gzip_min_length 1000;
+    gzip_proxied  expired no-cache no-store private auth;
+    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+    
+    access_log /var/log/nginx/localhost.access_log main;
+    error_log /var/log/nginx/error_log info;
+
+    # Deny access to .htaccess
+    location ~ /\.ht {
+    deny all;
+    return 404;
+    }
+    
+    location ~* \.html$ {
+      expires -1;
+    }
+
+    location ~*  \.(jpg|jpeg|png|gif|ico|css|js|xml)$ {
+      access_log off;
+      log_not_found off;
+      expires 30d;
+      add_header Pragma public;
+      add_header Cache-Control "public, must-revalidate, proxy-revalidate";
+    }
+}
+```
+<br><br>
+
 <b>TO DO:</b>
 <br>
 - [ ] services,
