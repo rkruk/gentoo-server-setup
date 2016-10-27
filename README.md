@@ -969,21 +969,21 @@ Now we can start our freshly installed `dcron`:
 /etc/init.d/dcron start
 rc-update add dcron default
 ```
-GeoIP is set and running. Now 
-More informations about those databases are <a target="_blank" href="http://dev.maxmind.com/geoip/legacy/geolite/">here</a>.
+GeoIP is set and running.<br>
+More informations about GeoIP datasets are <a target="_blank" href="http://dev.maxmind.com/geoip/legacy/geolite/">here</a>.
 <br>
-Additionally lets install something lightweight to rotate logs:
+Lets install something lightweight to rotate system logs:
 ```bash 
 emerge -av app-admin/metalog
 rc-update add metalog default
 ```
-It looks a bit chaotic? Don't worry a few final touches with nginx and we are done here. 
-In `/etc/nginx/nginx.conf` there is mentioned a `mime.types` file:
+It looks a bit chaotic.. - but don't worry :). A few final touches with nginx and we are done here. 
+In the `/etc/nginx/nginx.conf` file - there was mentioned something about `mime.types` - right? Lets edit that file:
 
 ```bash
 nano /etc/nginx/mime.types
 ```
-Inside of that file we can specify exactly what types of file nginx can serve. Here is a comprehensive list of all files you can include inside `mime.types`:
+Inside of `mime.types` we can specify exactly what types of file nginx can serve. Here is a comprehensive list of all files you can include inside `mime.types`:
 ```bash
 types {
     text/html                             html htm shtml;
@@ -1076,14 +1076,70 @@ types {
 ```
 
 <br>
-That was the neccessary basics to do with the nginx core settings. It is time to set up a website configuration. :D<br>
-The best way of set up a proper configuration for particular website is to make a separate configuration in the `/etc/nginx/sites-available/*.conf` for each website you host (thanks me later for that) and link it to the `/etc/nginx/sites-enabled/*.conf` directory. But for now go and edit `/etc/nginx/sites-available/example.conf` (change 'example' and use your own domain name here to know what is where later).<br><br>
+And that is all. The neccessary basics to do with the nginx core settings are mostly done. Now it is time to set up configuration for some websites. :D<br>
+It is recommended to configure each website separately in the `/etc/nginx/sites-available/` and link it to the `/etc/nginx/sites-enabled/` directory.<br> 
+Now lets edit `/etc/nginx/sites-available/example.conf` file (change 'example' and use your own domain name here to know what is where later).<br>
 
 ```bash
 nano /etc/nginx/sites-available/example.conf
 ```
-Inside of that file we need to put a lot of informations. Remember that we are going for a performance savy configuration here. In examples below I'll show you my 'optimal' configurations for various websites I'm hosting.<br><br>
-<p align="center"><b>VERSION 1:</b><br> 
+Inside of that file we need to put a lot of informations. Remember that we are going for a performance savy configuration here. In examples below I'll show you my two 'optimal' configurations I use for various websites.
+<br>
+<br>
+Let's try something smaller at the beginning (you can extend it later):<br><br>
+<p align="center"><b>VERSION 1</b>(recommended):<br>
+```bash
+server {
+    listen 80;
+    server_name www.example.com;
+    return 301 $scheme://example.com$request_uri;
+    }
+
+server {
+    listen 80;
+    server_name example.com;
+
+    root /home/user/website/example;
+
+    index index.html index.htm;
+
+    charset utf-8;
+
+    location / {
+      index index.html index.htm;
+      autoindex on;
+    }
+
+    gzip on;
+    gzip_min_length 1000;
+    gzip_proxied  expired no-cache no-store private auth;
+    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+    
+    access_log /var/log/nginx/localhost.access_log main;
+    error_log /var/log/nginx/error_log info;
+
+    # Deny access to .htaccess
+    location ~ /\.ht {
+    deny all;
+    return 404;
+    }
+    
+    location ~* \.html$ {
+      expires -1;
+    }
+
+    location ~*  \.(jpg|jpeg|png|gif|ico|css|js|xml)$ {
+      access_log off;
+      log_not_found off;
+      expires 30d;
+      add_header Pragma public;
+      add_header Cache-Control "public, must-revalidate, proxy-revalidate";
+    }
+}
+```
+<br>
+<br>
+<p align="center"><b>VERSION 2</b> (extended):<br> 
 ```bash
 # www to no www:
 server {
@@ -1234,59 +1290,7 @@ server {
 }
 ```
 <br>
-Big isn't it? Let's try something smaller at the beginning (you can extend it later):<br><br>
-<p align="center"><b>VERSION 2</b>(recommended):<br>
-```bash
-server {
-    listen 80;
-    server_name www.example.com;
-    return 301 $scheme://example.com$request_uri;
-    }
-
-server {
-    listen 80;
-    server_name example.com;
-
-    root /home/user/website/example;
-
-    index index.html index.htm;
-
-    charset utf-8;
-
-    location / {
-      index index.html index.htm;
-      autoindex on;
-    }
-
-    gzip on;
-    gzip_min_length 1000;
-    gzip_proxied  expired no-cache no-store private auth;
-    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
-    
-    access_log /var/log/nginx/localhost.access_log main;
-    error_log /var/log/nginx/error_log info;
-
-    # Deny access to .htaccess
-    location ~ /\.ht {
-    deny all;
-    return 404;
-    }
-    
-    location ~* \.html$ {
-      expires -1;
-    }
-
-    location ~*  \.(jpg|jpeg|png|gif|ico|css|js|xml)$ {
-      access_log off;
-      log_not_found off;
-      expires 30d;
-      add_header Pragma public;
-      add_header Cache-Control "public, must-revalidate, proxy-revalidate";
-    }
-}
-```
-<br>
-Start with the 'version 2' and configure it carefully while testing constantly to the 'version 1' 
+Start with the 'version 1' and configure it carefully. When you are happy with your results start adding changes from the 'version 2' 
 <br><br>
 When your `example.conf` is done and save - it is time to link it to the `/etc/nginx/sites-enabled` directory.<br>
 
