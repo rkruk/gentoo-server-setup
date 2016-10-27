@@ -521,7 +521,7 @@ That will overwrite the default value of NGINX_MODULES_HTTP and set it to spdy. 
 ```bash
 www-servers/nginx NGINX_MODULES_HTTP: spdy
 ```
-You definitely should check the complete list of USE flags specified for <a href="https://packages.gentoo.org/packages/www-servers/nginx">www-servers/nginx</a> package.<br>
+You definitely should check the complete list of USE flags specified for <a target="_blank" href="https://packages.gentoo.org/packages/www-servers/nginx">www-servers/nginx</a> package.<br>
 Ask what flags nginx have enabled by default:
 ```bash
 equery uses nginx
@@ -542,14 +542,36 @@ For example to start the nginx service do:
 ```bash
 /etc/init.d/nginx start
 ```
-The main nginx configuration is handled through the `/etc/nginx/nginx.conf` file:<br>
+
+<b>BUT DON'T START NGINX YET!!</b>
+<br>
+There is a lot to do with nginx configuration before firing it up. Let's start with changing a few files in the `/etc/nginx/` directory. 
+Our points of interest for now are `mime.types`  `nginx.conf` files. There is one more configuration inside `/etc/nginx/sites-available' - lets call it `example.com` file. As you can guess it is responsible of handling `example.com` domain.<br>
+
+The main nginx configuration is handled through the `/etc/nginx/nginx.conf` file. I'm using Cloudflare DNS, GeoIP exlusions, Gzip, and I'm focusing here on delivering websites written in pure html, css, js (no php, ruby, rust, js frameworks or other weird things cool kids use nowadys). Remember it is all about performance and simplicity here. No over complication with containers, markup conversions - just html websites. Simple as that. Lets tune main nginx configuration to squize a bit more from it:<br>
+
 ```bash
+nano /etc/nginx/nginx.conf
+```
+And do some changes here:<br>
+
+```bash
+#
 user nginx nginx;
+# It is common practice to run 1 worker process per core. Anything above this won't hurt your system, 
+# but it will leave idle processes usually just lying about.
+# To figure out what number you'll need to set worker_processes to, simply take a look at the amount 
+# of cores you have on your setup: grep processor /proc/cpuinfo | wc -l
+# In this example I'm using small one core CPU VPS:
 worker_processes 1;
 
 error_log /var/log/nginx/error_log info;
 
 events {
+        # The worker_connections command tells our worker processes how many people can simultaneously 
+        # be served by Nginx. The default value is 768; however, considering that every browser usually 
+        # opens up at least 2 connections/server, this number can half. To check our core's limitations
+        # issue: ulimit -n and use the result of this command as a good starting point.
         worker_connections 1024;
         use epoll;
         # for a worker to accept all new connections at one time:
@@ -923,11 +945,142 @@ http {
 }
 ```
 <br>
-The best way of setting a proper configuration for particular website is to make a separate configuration in the `/etc/nginx/sites-available/*.conf` and link it later to the `/etc/nginx/sites-enabled/*.conf` directory. I'll get to that part later.<br><br>
+Inside of `nginx.conf` there are a few things we need to cover now before anything else. There is a GeoIP module to install and set up. The <a target="_blank" href="http://dev.maxmind.com/geoip/geoip2/geolite2/">GeoLite</a> databases are distributed under the Creative Commons Attribution-ShareAlike 4.0 International License by <a target="_blank" href="http://www.maxmind.com">http://www.maxmind.com</a>.
+```bash
+emerge -Ss sys-process/cronie dev-libs/geoip net-misc/geoipupdate
+```
+This will install "geoiplookup" and "geoipupdate" to update the database.<br>
+As the geoiplookup database will be pretty outdated you might want to update it regularly as IP assignment changes. One way of doing that is to use a crontab. Get database:
+```bash
+wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz -O - | gunzip > /usr/share/GeoIP/GeoIP.dat.new && mv /usr/share/GeoIP/GeoIP.dat.new /usr/share/GeoIP/GeoIP.dat
+```
+To update it regularly create a new file in the cron.monthly:
+```bash
+nano /etc/cron.monthly/GeoIP
+```
+Inside of that file put that script:
+```bash
+#!/bin/bash
+wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz -O - | gunzip > /usr/share/GeoIP/GeoCity.dat.new && mv /usr/share/GeoIP/GeoCity.dat.new /usr/share/GeoIP/GeoCity.dat
+wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz -O - | gunzip > /usr/share/GeoIP/GeoIP.dat.new && mv /usr/share/GeoIP/GeoIP.dat.new /usr/share/GeoIP/GeoIP.dat
+```
+Now we can start our freshly installed `cronie`:
+```bash
+/etc/init.d/cronie start
+rc-update add cronie default
+```
+GeoIP is set and running. Now 
+More informations about those databases are <a target="_blank" href="http://dev.maxmind.com/geoip/legacy/geolite/">here</a>.
+<br>
+Additionally lets install something lightweight to rotate logs:
+```bash 
+emerge -av app-admin/metalog
+rc-update add metalog default
+```
+It looks a bit chaotic? Don't worry a few final touches with nginx and we are done here. 
+In `/etc/nginx/nginx.conf` there is mentioned a `mime.types` file:
+
+```bash
+nano /etc/nginx/mime.types
+```
+Inside of that file we can specify exactly what types of file nginx can serve. Here is a comprehensive list of all files you can include inside `mime.types`:
+```bash
+types {
+    text/html                             html htm shtml;
+    text/css                              css;
+    text/xml                              xml;
+    image/gif                             gif;
+    image/jpeg                            jpeg jpg;
+    application/javascript                js;
+    application/atom+xml                  atom;
+    application/rss+xml                   rss;
+
+    text/mathml                           mml;
+    text/plain                            txt;
+    text/vnd.sun.j2me.app-descriptor      jad;
+    text/vnd.wap.wml                      wml;
+    text/x-component                      htc;
+
+    image/png                             png;
+    image/tiff                            tif tiff;
+    image/vnd.wap.wbmp                    wbmp;
+    image/x-icon                          ico;
+    image/x-jng                           jng;
+    image/x-ms-bmp                        bmp;
+    image/svg+xml                         svg svgz;
+    image/webp                            webp;
+
+    application/font-woff                 woff;
+    application/java-archive              jar war ear;
+    application/json                      json;
+    application/mac-binhex40              hqx;
+    application/msword                    doc;
+    application/pdf                       pdf;
+    application/postscript                ps eps ai;
+    application/rtf                       rtf;
+    application/vnd.apple.mpegurl         m3u8;
+    application/vnd.ms-excel              xls;
+    application/vnd.ms-fontobject         eot;
+    application/vnd.ms-powerpoint         ppt;
+    application/vnd.wap.wmlc              wmlc;
+    application/vnd.google-earth.kml+xml  kml;
+    application/vnd.google-earth.kmz      kmz;
+    application/x-7z-compressed           7z;
+    application/x-cocoa                   cco;
+    application/x-java-archive-diff       jardiff;
+    application/x-java-jnlp-file          jnlp;
+    application/x-makeself                run;
+    application/x-perl                    pl pm;
+    application/x-pilot                   prc pdb;
+    application/x-rar-compressed          rar;
+    application/x-redhat-package-manager  rpm;
+    application/x-sea                     sea;
+    application/x-shockwave-flash         swf;
+    application/x-stuffit                 sit;
+    application/x-tcl                     tcl tk;
+    application/x-x509-ca-cert            der pem crt;
+    application/x-xpinstall               xpi;
+    application/xhtml+xml                 xhtml;
+    application/xspf+xml                  xspf;
+    application/zip                       zip;
+
+    application/octet-stream              bin exe dll;
+    application/octet-stream              deb;
+    application/octet-stream              dmg;
+    application/octet-stream              iso img;
+    application/octet-stream              msi msp msm;
+
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document    docx;
+    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet          xlsx;
+    application/vnd.openxmlformats-officedocument.presentationml.presentation  pptx;
+
+    audio/midi                            mid midi kar;
+    audio/mpeg                            mp3;
+    audio/ogg                             ogg;
+    audio/x-m4a                           m4a;
+    audio/x-realaudio                     ra;
+
+    video/3gpp                            3gpp 3gp;
+    video/mp2t                            ts;
+    video/mp4                             mp4;
+    video/mpeg                            mpeg mpg;
+    video/quicktime                       mov;
+    video/webm                            webm;
+    video/x-flv                           flv;
+    video/x-m4v                           m4v;
+    video/x-mng                           mng;
+    video/x-ms-asf                        asx asf;
+    video/x-ms-wmv                        wmv;
+    video/x-msvideo                       avi;
+}
+```
+<br>
+That was the neccessary basics to do with core nginx. It is time to set up a website configuration.<br>
+The best way of setting a proper configuration for particular website is to make a separate configuration in the `/etc/nginx/sites-available/*.conf` and link it later to the `/etc/nginx/sites-enabled/*.conf` directory. I'll get to that part later. For now go and edit `/etc/nginx/sites-available/example.conf` (change 'example' and use your own domain name here).<br><br>
 
 <b>TO DO:</b>
 <br>
 - [ ] services,
-- [ ] configuration,
+- [ ] configuration of metalog, denyhosts, ntp daemon, etc..
 - [ ] tests,
 - [ ] apply tighter security.
