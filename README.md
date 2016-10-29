@@ -352,7 +352,8 @@ sudo service fail2ban restart
 <p align="center">***
 <p align="center">**IPTABLES:**
 <br>
-Ladies and gentelmen the famous iptables:<br>
+
+Ladies and gentelmen - it is time for the famous iptables.<br>
 There are few things to do, before we install it. First go and edit `/etc/portage/package.use`:
 ```bash
 www-servers/nginx aio http http2 http-cache ipv6 nginx_modules_http_autoindex nginx_modules_http_browser nginx_modules_http_empty_gif nginx_modules_http_fancyindex nginx_modules_http_gzip ssl http_v2_module ngx_http_v2_module nginx_modules_image_filter ngx_http_empty_gif nginx_modules_http_referer nginx_modules_http_geo nginx_modules_http_geoip nginx_modules_http_gunzip nginx_modules_http2
@@ -376,10 +377,14 @@ net-firewall/ipset -modules
 >=media-libs/gd-2.2.3 png jpeg
 ```
 Lets install it:
-```bash
+<!--```bash
 emerge -av net-analyzer/fail2ban net-firewall/iptables net-firewall/ipset
 ```
-To check the rules that iptables puts in effect religiously memorise it and use following command:<br>
+-->
+```bash
+emerge -av net-firewall/iptables net-firewall/ipset
+```
+To check the rules that iptables puts in effect religiously memorise the following command:<br>
 
 ```bash
 iptables -L
