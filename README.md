@@ -464,7 +464,14 @@ Set the script permissions:
 sudo chmod +x /etc/network-iptables-rules
 ```
 
-Restore those rules to make them filter all network traffic:
+Before we go any further there is a need to install one more thing:
+
+```bash
+USE="-modules" emerge -av net-firewall/ipset
+```
+IPSET is extermelly needed to smartly block some countries. :/ <br>
+
+Restore IPTABLES rules now to make them filter all network traffic:
 
 ```bash
 iptables-restore < /etc/iptables.firewall.rules
