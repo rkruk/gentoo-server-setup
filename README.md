@@ -255,6 +255,7 @@ After that restart the SSH service to load the new configuration.
 sudo service ssh restart
 ```
 <br>
+<!-- Fail2ban is to heavy - it needs to be replaced (I've removed it from the server)
 <p align="center">***
 <p align="center">**Fail2ban for SSH**<br>
 
@@ -262,7 +263,7 @@ Fail2ban is a log-parsing application that monitors system logs for symptoms of 
 
 Install Fail2ban and iptables:
 ```bash
-emerge -av net-analyzer/fail2ban net-firewall/iptables
+emerge -av net-analyzer/fail2ban net-firewall/iptables net-firewall/ipset
 ```
 
 Iptables should be already installed - it is only to make sure that we have it in the system. We'll configure it a bit later.<br><br>
@@ -346,11 +347,39 @@ When all changes in the fail2ban configurations are set and saved, there is only
 sudo service fail2ban restart
 ```
 <br><br>
+-->
+
 <p align="center">***
 <p align="center">**IPTABLES:**
 <br>
+Ladies and gentelmen the famous iptables:<br>
+There are few things to do, before we install it. First go and edit `/etc/portage/package.use`:
+```bash
+www-servers/nginx aio http http2 http-cache ipv6 nginx_modules_http_autoindex nginx_modules_http_browser nginx_modules_http_empty_gif nginx_modules_http_fancyindex nginx_modules_http_gzip ssl http_v2_module ngx_http_v2_module nginx_modules_image_filter ngx_http_empty_gif nginx_modules_http_referer nginx_modules_http_geo nginx_modules_http_geoip nginx_modules_http_gunzip nginx_modules_http2
 
-To check the rules that fail2ban puts in effect within the IP table religiously memorise and use following command:<br>
+# required by media-gfx/graphviz-2.26.3-r4::gentoo
+# required by @preserved-rebuild (argument)
+>=media-libs/gd-2.0.35-r4 truetype fontconfig
+
+# If it doesn't work change to temporary fix (old version doesn't have hpn support): -hpn
+# But current openssh works just fine.
+net-misc/openssh hpn
+
+# iptables geoip:
+net-firewall/iptables extensions
+
+# ipset for non modular kernel:
+net-firewall/ipset -modules
+# required by www-servers/nginx-1.10.1::gentoo[nginx_modules_http_image_filter]
+# required by @selected
+# required by @world (argument)
+>=media-libs/gd-2.2.3 png jpeg
+```
+Lets install it:
+```bash
+emerge -av net-analyzer/fail2ban net-firewall/iptables net-firewall/ipset
+```
+To check the rules that iptables puts in effect religiously memorise it and use following command:<br>
 
 ```bash
 iptables -L
@@ -399,6 +428,10 @@ Paste the following into `/etc/iptables.firewall.rules`:
 
 #  Allow ping
 -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
+
+# Fancy to install IRC maybe? (if not hash it):
+-A INPUT -i eth0 -p tcp -m tcp --sport 6667 -j ACCEPT
+-A OUTPUT -o eth0 -p tcp -m tcp --dport 6667 -j ACCEPT
 
 #  Log iptables denied calls
 -A INPUT -m limit --limit 5/min -j LOG --log-prefix "iptables denied: " --log-level 7
@@ -467,7 +500,7 @@ sudo chmod +x /etc/network-iptables-rules
 Before we go any further there is a need to install one more thing:
 
 ```bash
-USE="-modules" emerge -av net-firewall/ipset
+emerge -av net-firewall/ipset
 ```
 IPSET is extermelly needed to smartly block some countries. :/ <br>
 
@@ -533,11 +566,16 @@ Ask what flags nginx have enabled by default:
 ```bash
 equery uses nginx
 ```
-And change flags accordingly to your needs in the `/etc/portage/make.conf`. For example:<br>
+And change flags accordingly to your needs in the `/etc/portage/make.conf`. For starters it should look like:<br>
 ```bash
-USE="aio http http-cache http2 ipv6 pcre poll select ssl threads -cpp_test -debug -google_perftools"
+USE="aio bindist http http-cache http2 ipv6 mmx pcre poll select sse sse2 ssl threads -cpp_test -debug -google_perftools"
+
 NGINX_MODULES_HTTP="autoindex browser charset empty_gif geo gzip limit_conn limit_req map proxy referer rewrite scgi split_clients ssi upstream_hash upstream_ip_hash upstream_keepalive upstream_least_conn upstream_zone userid uwsgi geoip gunzip gzip_static image_filter realip"
-NGINX_MODULES_MAIL="-imap -pop3 -smtp"
+```
+I'm sure that portage with throw some errors here and there.
+
+```bash
+
 ```
 <br>
 With all USE flags set, lets install www-servers/nginx:
@@ -547,8 +585,13 @@ emerge --ask www-servers/nginx
 The nginx package will install an init service script allowing you to stop, start, or restart the service.<br> 
 For example to start the nginx service do:
 ```bash
-/etc/init.d/nginx start
+service nginx start
 ```
+To restart do:
+```bash
+service nginx restart
+```
+You get that? ;) 
 
 <b>BUT DON'T START NGINX YET!!</b>
 <br>
@@ -953,13 +996,20 @@ http {
 ```
 <br>
 Inside of `nginx.conf` there are a few things we need to cover now before anything else. There is a GeoIP module to install and set up. The <a target="_blank" href="http://dev.maxmind.com/geoip/geoip2/geolite2/">GeoLite</a> databases are distributed under the Creative Commons Attribution-ShareAlike 4.0 International License by <a target="_blank" href="http://www.maxmind.com">http://www.maxmind.com</a>.
-```bash
+
+```bash 
 emerge -Ss sys-process/dcron dev-libs/geoip net-misc/geoipupdate
 ```
 This will install "geoiplookup" and "geoipupdate" to update the database.<br>
-As the geoiplookup database will be pretty outdated you might want to update it regularly as IP assignment changes. One way of doing that is to use a crontab. Get database:
+As the geoiplookup database will be pretty outdated you might want to update it regularly as IP assignment changes. One way of doing that is to use a crontab. Get that database installed. First country rules:
 ```bash
-wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz -O - | gunzip > /usr/share/GeoIP/GeoIP.dat.new && mv /usr/share/GeoIP/GeoIP.dat.new /usr/share/GeoIP/GeoIP.dat
+wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz -O - | gunzip > /etc/nginx/geoip/GeoIP.dat.new && mv /etc/nginx/geoip/GeoIP.dat.new /etc/nginx/geoip/GeoIP.dat 
+```
+<br>
+Then city rules (because why not?):
+```bash
+mkdir /etc/nginx/geoip && cd /etc/nginx/geoip && wget -N http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz && gunzip GeoLiteCity.dat.gz
+
 ```
 To update it regularly create a new file in the cron.monthly:
 ```bash
@@ -968,8 +1018,8 @@ nano /etc/cron.monthly/GeoIP
 Inside of that file put that script:
 ```bash
 #!/bin/bash
-wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz -O - | gunzip > /usr/share/GeoIP/GeoCity.dat.new && mv /usr/share/GeoIP/GeoCity.dat.new /usr/share/GeoIP/GeoCity.dat
-wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz -O - | gunzip > /usr/share/GeoIP/GeoIP.dat.new && mv /usr/share/GeoIP/GeoIP.dat.new /usr/share/GeoIP/GeoIP.dat
+wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz -O - | gunzip > /etc/nginx/geoip/GeoCity.dat.new && mv /usr/share/geoip/GeoCity.dat.new /usr/share/geoip/GeoCity.dat
+wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz -O - | gunzip > /etc/nginx/geoip/GeoIP.dat.new && mv /etc/nginx/geoip/GeoIP.dat.new /etc/nginx/geoip/GeoIP.dat
 ```
 Now we can start our freshly installed `dcron`:
 ```bash
@@ -985,7 +1035,7 @@ emerge -av app-admin/metalog
 rc-update add metalog default
 ```
 It looks a bit chaotic.. - but don't worry :). A few final touches with nginx and we are done here. 
-In the `/etc/nginx/nginx.conf` file - there was mentioned something about `mime.types` - right? Lets edit that file:
+In the `/etc/nginx/nginx.conf` file - there is `mime.types` line - right? Lets check if we have it as it should be:
 
 ```bash
 nano /etc/nginx/mime.types
@@ -1124,12 +1174,6 @@ server {
     
     access_log /var/log/nginx/localhost.access_log main;
     error_log /var/log/nginx/error_log info;
-
-    # Deny access to .htaccess
-    location ~ /\.ht {
-    deny all;
-    return 404;
-    }
     
     location ~* \.html$ {
       expires -1;
@@ -1176,7 +1220,7 @@ server {
        ssl_session_cache shared:SSL:50m;
        ssl_session_timeout 5m;
 
-       # Diffie-Hellman parameter for DHE ciphersuites, recommended 2048 bits
+       # Diffie-Hellman parameter for DHE ciphersuites, recommended 2048 bits.
        ssl_dhparam /etc/nginx/ssl/dhparam.pem;
 
        # enables server-side protection from BEAST attacks
@@ -1189,8 +1233,7 @@ server {
 
        # ciphers chosen for forward secrecy and compatibility
        # http://blog.ivanristic.com/2013/08/configuring-apache-nginx-and-openssl-for-forward-secrecy.html
-       ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES12$
-
+       ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:ECDHE-RSA-RC4-SHA:ECDHE-ECDSA-RC4-SHA:RC4-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!3DES:!MD5:!PSK';
        # enable ocsp stapling (mechanism by which a site can convey certificate revocation information to visitors in a 
        # privacy-preserving, scalable manner)
        # --> http://blog.mozilla.org/security/2013/07/29/ocsp-stapling-in-firefox/
@@ -1245,12 +1288,6 @@ server {
        location /404.html {
           # Change it accordingly to the location of website files:
           root /home/user/website/example;
-          }
-
-       # Deny access to .htaccess
-       location ~ /\.ht {
-          deny all;
-          return 404;
           }
 
        location ~* \.html$ {
@@ -1314,6 +1351,11 @@ Eliminate all errors from your configs. run `nginx -t` to the moment you have go
 And push it online:<br>
 ```bash
 service nginx start
+```
+<br>
+Finally add nginx to the start:
+```bash
+rc-update add nginx default
 ```
 
 <b>TO DO:</b>
