@@ -493,7 +493,7 @@ Inside of that file put:
 ```
 
 <!-- TODO: That is not working yet!
-     RULES won't restore back - this method require manual restore somehow :/ 
+     RULES won't restore back on gentoo - this method require manual restore somehow - to review! :/ 
 -->
 
 Set the script permissions:
@@ -507,7 +507,7 @@ Before we go any further there is a need to install one more thing:
 ```bash
 emerge -av net-firewall/ipset
 ```
-IPSET is extermelly needed to smartly block some countries. :/ <br>
+Coutry based rules in IPTABLES won't work without IPSET. So we need IPSET to smartly block some countries. :/ <br>
 
 Restore IPTABLES rules now to make them filter all network traffic:
 
