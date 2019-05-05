@@ -1,16 +1,17 @@
-***
-<p align="center">![Gentoo](https://github.com/rkruk/gentoo-server-setup/blob/master/larry.png)
+<p align="center">
+  <img src="https://github.com/rkruk/gentoo-server-setup/blob/master/larry.png">
+</p>
 <br>
-#### <p align="center">**Gentoo Server Setup** 
+<p align="center"><b>GENTOO SERVER SETUP</b></p>
 
-<p align="center">Set Up your own Gentoo based Web Server
+<p align="center"><b>Set Up your own Gentoo based Web Server</b></p>
 
 ------------------------------------------------------------------------
 
 ----------
 <br>
-<p align="center">***
-<p align="center">**Introduction**
+<p align="center"><b>***</b></p>
+<p align="center"><b>Introduction</b></p>
 <br>
 <p align="center">First of all let me state:
 <br><br>
@@ -29,8 +30,8 @@ Same thing is with all log damemons, web servers, firewalls, etc.. Yes, you can 
 <p align="left">3. Low resource footprint (for real - it is lower than anything else I have ever used and seen in the past - lower than debian - for real). Results are almost similar to LFS if system is set correctly.
 <br>
 <br>
-<p align="center">***
-<p align="center">**Hosting**
+<p align="center"><b>***</b></p>
+<p align="center"><b>Hosting</b></p>
 <p align="left">You can install it on your own hardware if you have it. You can rent a rack somewhere if you have cash to burn. Or you can use VPS. There are a few VPS providers out there allowing you to set up your own Gentoo VPS directly (Shout out to <a href="https://linode.com">Linode</a>) or to install your own ISO (Awesome people at<a href="https://wiki.gandi.net/en/hosting/create-server/private-image"> Gandi.net</a>). I'm aware of the fact that Amazon AWS have Gentoo images, but I haven't used them and I can't say anything about it (folks at [Dowd and Associates](http://www.dowdandassociates.com/) are responsible for those system images).
 <p align="left">-I'm sure there is more providers - I'm not aware of - offering custom ISO install allowing you to set your own Gentoo on their infrastructure.
 <p align="left">-If you are lucky to have your own server (not the cloud thingy) I'm sure you can use this howto without any problems or changes.
@@ -38,8 +39,8 @@ Same thing is with all log damemons, web servers, firewalls, etc.. Yes, you can 
 <p align="left">I won't cover here installation process - Linode will roll it out for you automatically with the help of their installation scripts - just do some magic with with help of your mouse and keyboard. It is straightforward process and it is extremely easy. Otherwise install it on your own with the use of one of the best documentations written ever (just right after *BSD documentation) at the <a href="https://www.gentoo.org/">gentoo.org</a> website.
 <br>
 <br>
-<p align="center">****
-<p align="center">**First Steps**
+<p align="center"><b>****</b></p>
+<p align="center"><b>First Steps</b></p>
 
 <p align="left">*I assume that you already installed your Gentoo based system and you know how to connect through SSH onto it. Your server should be up and running already of course.*
 <br>
@@ -349,11 +350,11 @@ sudo service fail2ban restart
 <br><br>
 -->
 
-<p align="center">***
-<p align="center">**IPTABLES:**
+<p align="center"><b>***</b></p>
+<p align="center"><b>IPTABLES:</b></p>
 <br>
 
-Ladies and gentelmen - it is time for the famous iptables.<br>
+It is time for the iptables configuration.<br>
 There are few things to do, before we install it. First go and edit `/etc/portage/package.use`:
 ```bash
 www-servers/nginx aio http http2 http-cache ipv6 nginx_modules_http_autoindex nginx_modules_http_browser nginx_modules_http_empty_gif nginx_modules_http_fancyindex nginx_modules_http_gzip ssl http_v2_module ngx_http_v2_module nginx_modules_image_filter ngx_http_empty_gif nginx_modules_http_referer nginx_modules_http_geo nginx_modules_http_geoip nginx_modules_http_gunzip nginx_modules_http2
@@ -533,13 +534,17 @@ I know that we have barely scratched the surface with securing this tiny fluffy 
 
 Lets install some basic services for hosting websites, irc and git. As we are focusing on keeping it speed and secure there is no place for databases or things like php nasty bloat.
 <br><br>
-<p align="center">***
-<p align="center">**Web Server:**
+<p align="center"><b>***</b></p>
+<p align="center"><b>Web Server:</b></p>
 <br>
 
 <p align="left">While I am not aware of any Gentoo specific benchmarks that have been run on the various flavors of web servers, it is typically logical to assume that the more feature-enabled by default web server you install, the more resources it would use.<br>
-I spent a lot of time reading various documentations and comparing all informations carefully. I also had in the past my ups and downs with Apache, I did some trials with Lighttpd, etc.. Long story short NGINX web server is better in the 'raw number of requests per second it can serve' than Apache or Lighttpd servers no matter how well configured they are. At higher levels of concurrency, NGINX can handle fewer requests per second, but still can serve double what Lighttpd does (which is already doing nearly 4x what Apache was ever able to do).<br>
-<p align="center">![Gentoo](https://github.com/rkruk/gentoo-server-setup/blob/master/Webserver_requests_graph.jpg)<br>
+I spent a lot of time reading various documentations and comparing all informations carefully. I also had in the past my ups and downs with Apache, I did some trials with Lighttpd, etc.. Long story short NGINX web server is better in the 'raw number of requests per second it can serve' than Apache or Lighttpd servers no matter how well configured they are. At higher levels of concurrency, NGINX can handle fewer requests per second, but still can serve double what Lighttpd does (which is already doing nearly 4x what Apache was ever able to do).</p>
+<br>
+<p align="center">
+  <img src="https://github.com/rkruk/gentoo-server-setup/blob/master/Webserver_requests_graph.jpg">
+</p>
+<br>
 <p align="left">Though Apache supports a larger toolbox of things it can do immediately after install, yet it can be something of a memory hog with all modules enabled by default. Contrary freshly installed NGINX does not eat as much memory compared to Apache (even with enabled additional modules is still faster and scale way better).<br><br>
 I should also mention that nginx is a also good as a reverse proxy server!<br><br>
 
@@ -1008,12 +1013,13 @@ emerge -Ss sys-process/dcron dev-libs/geoip net-misc/geoipupdate
 This will install "geoiplookup" and "geoipupdate" to update the database.<br>
 As the geoiplookup database will be pretty outdated you might want to update it regularly as IP assignment changes. One way of doing that is to use a crontab. Get that database installed. First country rules:
 ```bash
-wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz -O - | gunzip > /etc/nginx/geoip/GeoIP.dat.new && mv /etc/nginx/geoip/GeoIP.dat.new /etc/nginx/geoip/GeoIP.dat 
+wget -q https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz
+-O - | gunzip > /etc/nginx/geoip/GeoIP.dat.new && mv /etc/nginx/geoip/GeoIP.dat.new /etc/nginx/geoip/GeoIP.dat 
 ```
 <br>
 Then city rules (because why not?):
 ```bash
-mkdir /etc/nginx/geoip && cd /etc/nginx/geoip && wget -N http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz && gunzip GeoLiteCity.dat.gz
+mkdir /etc/nginx/geoip && cd /etc/nginx/geoip && wget -N https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz && gunzip GeoLiteCity.dat.gz
 
 ```
 To update it regularly create a new file in the cron.monthly:
@@ -1023,8 +1029,8 @@ nano /etc/cron.monthly/GeoIP
 Inside of that file put that script:
 ```bash
 #!/bin/bash
-wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz -O - | gunzip > /etc/nginx/geoip/GeoCity.dat.new && mv /usr/share/geoip/GeoCity.dat.new /usr/share/geoip/GeoCity.dat
-wget -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz -O - | gunzip > /etc/nginx/geoip/GeoIP.dat.new && mv /etc/nginx/geoip/GeoIP.dat.new /etc/nginx/geoip/GeoIP.dat
+wget -q https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz -O - | gunzip > /etc/nginx/geoip/GeoCity.dat.new && mv /usr/share/geoip/GeoCity.dat.new /usr/share/geoip/GeoCity.dat
+wget -q https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz -O - | gunzip > /etc/nginx/geoip/GeoIP.dat.new && mv /etc/nginx/geoip/GeoIP.dat.new /etc/nginx/geoip/GeoIP.dat
 ```
 Now we can start our freshly installed `dcron`:
 ```bash
@@ -1032,7 +1038,7 @@ Now we can start our freshly installed `dcron`:
 rc-update add dcron default
 ```
 GeoIP is set and running.<br>
-More informations about GeoIP datasets are <a target="_blank" href="http://dev.maxmind.com/geoip/legacy/geolite/">here</a>.
+More informations about GeoIP datasets are <a target="_blank" href="https://dev.maxmind.com/geoip/geoip2/geolite2/">here</a>.
 <br>
 Lets install something lightweight to rotate system logs:
 ```bash 
@@ -1221,7 +1227,7 @@ server {
        ssl_certificate_key /etc/nginx/ssl/example.com.key;
 
        # enable session resumption to improve https performance
-       # http://vincent.bernat.im/en/blog/2011-ssl-session-reuse-rfc5077.html
+       # https://vincent.bernat.im/en/blog/2011-ssl-session-reuse-rfc5077.html
        ssl_session_cache shared:SSL:50m;
        ssl_session_timeout 5m;
 
@@ -1229,19 +1235,19 @@ server {
        ssl_dhparam /etc/nginx/ssl/dhparam.pem;
 
        # enables server-side protection from BEAST attacks
-       # http://blog.ivanristic.com/2013/09/is-beast-still-a-threat.html
+       # https://blog.ivanristic.com/2013/09/is-beast-still-a-threat.html
        ssl_prefer_server_ciphers on;
 
        # disable SSLv3(enabled by default since nginx 0.8.19) since it's less secure then TLS
-       # http://en.wikipedia.org/wiki/Secure_Sockets_Layer#SSL_3.0
+       # https://en.wikipedia.org/wiki/Secure_Sockets_Layer#SSL_3.0
        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 
        # ciphers chosen for forward secrecy and compatibility
-       # http://blog.ivanristic.com/2013/08/configuring-apache-nginx-and-openssl-for-forward-secrecy.html
+       # https://blog.ivanristic.com/2013/08/configuring-apache-nginx-and-openssl-for-forward-secrecy.html
        ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:ECDHE-RSA-RC4-SHA:ECDHE-ECDSA-RC4-SHA:RC4-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!3DES:!MD5:!PSK';
        # enable ocsp stapling (mechanism by which a site can convey certificate revocation information to visitors in a 
        # privacy-preserving, scalable manner)
-       # --> http://blog.mozilla.org/security/2013/07/29/ocsp-stapling-in-firefox/
+       # --> https://blog.mozilla.org/security/2013/07/29/ocsp-stapling-in-firefox/
 
        # SSL Stapling(Doesn't work on cloudflare SSl Cert (no CA Cert Available)):
        # ssl_trusted_certificate /etc/nginx/ssl/..??;
@@ -1250,8 +1256,8 @@ server {
        # ssl_stapling_verify on;
 
        # config to enable HSTS(HTTP Strict Transport Security) 
-       # --> https://developer.mozilla.org/en-US/docs/Security/HTTP_Strict_Transport_Security
-       # to avoid ssl stripping https://en.wikipedia.org/wiki/SSL_stripping#SSL_stripping
+       # --> https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+       # to avoid ssl stripping https://en.wikipedia.org/wiki/Moxie_Marlinspike#SSL_stripping
        add_header Strict-Transport-Security "max-age=31536000; includeSubdomains;";
 
        # And here is the rest of the configuration.
