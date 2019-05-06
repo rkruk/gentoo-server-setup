@@ -15,28 +15,29 @@
 <br>
 <p align="center">First of all let me state:
 <br><br>
-**-I'm not insane**.  ¯\\_(ツ)_/¯
+<b>-I'm not insane</b>.  ¯\\_(ツ)_/¯
 <br><br>
-**-It is really worth the effort**.
+<b>-It is really worth the effort</b>.
 <br><br>
 Contrary to popular beliefs Gentoo is not a time consuming left in the past fringe distro. Trough the last 8 years I've used and tested most of existing Linux and *BSD based Distributions - that is a fascinating yet tedious hobby of mine. Don't ask me why.. - it is just my thing. By most I mean, like distrowatch.com from top to bottom (and a few more - non existing any more).  
 <br>
 <br>
-Currently I have a few Gentoo based servers with a quite decent uptime (not like it is a bad thing..) - and I can bet that they are working a way better than any comparable Ubuntu, CentOS, etc.. server I've used in the past.<br><br> *I know - this is a* **bold** *statement to say things like that. But let me explain*:
+Currently I have a few Gentoo based servers with a quite decent uptime (not like it is a bad thing..) - and I can bet that they are working a way better than any comparable Ubuntu, CentOS, etc.. server I've used in the past.<br><br> I know - this is a <b>bold</b> statement to say things like that. But let me explain:
 <p align="left">1. Continous uptime without the need of reboot to switch to the new version of the kernel, services,etc.. (sometimes it is tricky but yet possible (kernel - duh!)).
 <p align="left">2. System is fully customisable, every single part can be adjusted as you like it, every daemon, service,.. - you decide what you want - not the distro maintainers with all those tedious dependencies forcing you to use THAT version of THAT software with tons of bloat as a dependecies. You say 'every Linux is customisable' - and I laught :D .<br><br> 
-For starters simple example: NTP daemon (`net-misc/ntp`) is quite resource heavy for a small silly daemon - I've changed it to openntpd (NTP server ported from OpenBSD - it use less resources).<br> 
+For starters simple example: NTP daemon (`net-misc/ntp`) is quite resource heavy for a small silly daemon - I've changed it to openntpd (NTP server ported from OpenBSD - it use less resources).
+<br><br> 
 Same thing is with all log damemons, web servers, firewalls, etc.. Yes, you can do things like that on any other distro. But I wonder how much od your's precious time will you waste to do just that? :D
 <p align="left">3. Low resource footprint (for real - it is lower than anything else I have ever used and seen in the past - lower than debian - for real). Results are almost similar to LFS if system is set correctly.
 <br>
 <br>
 <p align="center"><b>***</b></p>
 <p align="center"><b>Hosting</b></p>
-<p align="left">You can install it on your own hardware if you have it. You can rent a rack somewhere if you have cash to burn. Or you can use VPS. There are a few VPS providers out there allowing you to set up your own Gentoo VPS directly (Shout out to <a href="https://linode.com">Linode</a>) or to install your own ISO (Awesome people at<a href="https://wiki.gandi.net/en/hosting/create-server/private-image"> Gandi.net</a>). I'm aware of the fact that Amazon AWS have Gentoo images, but I haven't used them and I can't say anything about it (folks at [Dowd and Associates](http://www.dowdandassociates.com/) are responsible for those system images).
-<p align="left">-I'm sure there is more providers - I'm not aware of - offering custom ISO install allowing you to set your own Gentoo on their infrastructure.
+<p align="left">You can install it on your own hardware if you have it. You can rent a rack somewhere if you have cash to burn. Or you can use VPS. There are a few VPS providers out there allowing you to set up your own Gentoo VPS directly (Shout out to <a href="https://linode.com">Linode</a>) or to install your own ISO (Awesome people at<a href="https://wiki.gandi.net/en/hosting/create-server/private-image"> Gandi.net</a>). I'm aware of the fact that Amazon AWS have Gentoo images, but I haven't used them and I can't say anything about it (folks at <a href="http://www.dowdandassociates.com/">Dowd and Associates</a> are responsible for those system images).
+<p align="left">-I'm sure there are other providers - I'm not aware of - offering custom ISO install allowing you to set your own Gentoo on their infrastructure.
 <p align="left">-If you are lucky to have your own server (not the cloud thingy) I'm sure you can use this howto without any problems or changes.
 <p align="left">*I'm going to use Linode's VPS as an installation example here. Adapt it to your own needs as you like.*
-<p align="left">I won't cover here installation process - Linode will roll it out for you automatically with the help of their installation scripts - just do some magic with with help of your mouse and keyboard. It is straightforward process and it is extremely easy. Otherwise install it on your own with the use of one of the best documentations written ever (just right after *BSD documentation) at the <a href="https://www.gentoo.org/">gentoo.org</a> website.
+<p align="left">I won't cover here installation process - Linode will roll it out for you automatically with the help of their installation scripts - just do some magic with with help of your mouse and keyboard. It is straightforward process and it is extremely easy. Otherwise install it on your own with the use of one of the best documentations written ever (just right after *BSD documentation) at the <a href="https://www.gentoo.org/">Gentoo.org</a> website.
 <br>
 <br>
 <p align="center"><b>****</b></p>
@@ -52,11 +53,13 @@ ssh root@123.456.78.9
 <br>
 Yes, unfortunately first login is as a root user. We'll change it soon during the initial configuration of our new server.<br>
 But first things first let's synchronize server repositories:<br>
+
 ```bash
 emerge --sync
 ```
 <br>
 I would recommend update the whole thing now (at Gentoo it is better to know about any problems at the begining): <br>
+
 ```bash
 emerge -uavDN system && emerge -uavDN world
 ```
@@ -68,20 +71,27 @@ OK. First major update will for sure flag some problems with packages dependecie
 After that carefully read what `etc-update` and `dispatch-conf` tools are telling you to do and <a href="https://wiki.gentoo.org/wiki/Handbook:X86/Portage/Tools">follow instructions</a>.<br><br>
 And finally when the `emerge -uavDN system && emerge -uavDN world` update is done fully and Gentoo accepted your sacrifice :D - you can begin setting up and configure your server for web.<br><br>
 Let's start with setting up a Hostname and fully qualified domain name (<a href="http://gentoo-en.vfose.ru/wiki/Fully_Qualified_Domain_Name_Configuration">FQDN</a>) and enter the following commands to set the hostname, replacing hostname with the hostname of your choice:
+
 ```bash
 echo "HOSTNAME=\"hostname\"" > /etc/conf.d/hostname
 ```
+
 and then:
+
 ```bash
 /etc/init.d/hostname restart
 ```
+
 Hostname can be set also in the:
+
 ```bash
 echo "your hostname" > /etc/hostname
 ```
+
 You should check which configuration your server has. just check inside of /etc directory for hostname file or inside /etc/conf.d/. Then pick the right command. Not before!
 
 After that check your hostname:
+
 ```bash
 hostname -F /etc/hostname
 hostname
@@ -90,68 +100,93 @@ hostname
 Next lets update the `/etc/hosts` file.<br> 
 This file creates static associations between IP addresses and hostnames, with higher priority than DNS!<br> 
 In the example below, `123.456.78.9` is our public accessible IP address, `hostname` is our local hostname, and `hostname.example.com` is our FQDN. Your `/etc/hosts` file should look like that:
+
 ```bash
 127.0.0.1 localhost.localdomain localhost
 123.456.78.9 hostname.example.com hostname
 ```
+
 Don't edit first '127.0.0.1' line, it is for localhost internal server loopback network - but it is highly recommended to add the second line with the right IP address and your Fully Qualified Domain Name.<br>
 You are the owner of `example.com` and in the `/etc/hostname` your server has its own name (here it is `hostname` but you can name it as you want it - it doesn't really matter). FQDN does not need to have any relationship to websites hosted on this server. As an example, you might host “example.com” website on your server, but the system’s FQDN might be “xyz.example.com.”<br><br>
 It is highly recommended to have registered domain/subdomain on the DNS level for FQDN purposes.
 <br><br>
+
 `hostname.example.com` is our FQDN here. The value you assign as your system’s FQDN should have an “A” record in DNS pointing to your's server address.
 <br><br>
 As you can see here all server configuration files are self explanatory :D<br>
 <br><br>
 Lets continue now with setting up the Timezone for the server.<br>
 View the list of all available zone files:
+
 ```bash
 ls /usr/share/zoneinfo
 ```
+
 And manually symlink a zone file in /usr/share/zoneinfo to /etc/localtime:
+
 ```bash
 ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime
 ```
+
 As I'm based in the UK I'm going to set it up in this example for the UK based zone. 
 <br>
 Confirm that the timezone is set correctly:
+
 ```bash
 date
 ```
+
 <br>
 Add a Limited User Account for day-to-day use with limited rights (in this example I choose a 'larry' username):<br>
+
 ```bash
 useradd -m -G users,wheel -s /bin/bash larry
 ```
+
 and set up a password:
+
 ```bash
 passwd larry
 ```
+
 Add user to the `wheel` group (`wheel` sudo group so you’ll have administrative privileges):
+
 ```bash
 usermod -aG wheel larry
 ```
+
 Check if the `wheel` group is uncommented in the `/etc/sudoers` file:
+
 ```bash
 nano /etc/sudoers
 ```
+
 and look for the line:
+
 ```bash
 %wheel ALL=(ALL) ALL
 ```
+
 Save all changes.<br>
 With the new user set you can now log out from your VPS. There is no need to use a root account to log into your server (it is considered as a extremely stupid and dangerous though - we'll block that option later).
+
 ```bash
 exit
 ```
+
 <br>
 Log back in with your new user (here it will be: 'Larry'). Remember to use IP address of your server:
+
 ```bash
 ssh larry@123.456.78.9
 ```
+
 Now you can administer server from your new user account instead of root. If you really want to become a `root` user just use the:
+
 ```bash
 su -
 ```
+
 Make neccessary changes and then `exit` to become a normal user again.<br>
 You can also use `sudo` command instead of switching between users:
 
@@ -178,52 +213,71 @@ Minimum key size is 1024 bits, default is 2048 (see `man ssh-keygen`) and maximu
 <p align="center">**(This has to be done on your local computer, not on the VPS !!!)**
 
 <p align="left">We are going to create a 8192-bit RSA key pair here. There are voices in the community that we should use bigger, better, stronger keys. But key is only one small part of the security. And right now, a default 2048-bit RSA key, or any greater length (such as the 4096-bit key size of the Github suggestion), is unbreakable with today's technology and known factorization algorithms. Even with very optimistic assumptions on the future improvements of computational power available for a given price (namely, that Moore's law holds at its peak rate for the next three decades), a 3072-bit RSA key won't become breakable within the next 30 years by Mankind as a whole, let alone by an Earth-based organization. Of course, there always remains the possibility of some unforeseen mathematical breakthrough that makes breaking RSA keys a lot easier. Unforeseen breakthroughs are, by definition, unpredictable, so any debate on that subject is by nature highly speculative.<br>If you need more security than default RSA-2048 offers, the way to go would be to switch to elliptical curve cryptography (ed25519)<br>
+  
 <!--
      SSH part needs to be revised!
 -->
+
 During creation of the key, you will be given the option to encrypt the private key with a passphrase. This means that key cannot be used without entering the passphrase. I suggest to use the key pair with a passphrase.
+
 ```bash
 ssh-keygen -b 8192
 ```
+
 Press `Enter` to use the default names id_rsa and id_rsa.pub in /home/your_username/.ssh - before entering your passphrase.<br>
 Next let's upload the public key to your server. Replace `larry` user with the name of the user you created on the server, and 172.16.254.1 with your VPS IP address.<br>
 From your local computer:
+
 ```bash
 ssh-copy-id larry@123.456.78.9
 ```
+
 Or if you prefer `scp` command:<br><br>
 On the VPS create `.ssh` directory and change permissions for it:
+
 ```bash
 mkdir -p ~/.ssh && sudo chmod -R 700 ~/.ssh/ 
 ```
+
 From your local computer:
+
 ```bash
 scp ~/.ssh/id_rsa.pub larry@123.456.78.9:~/.ssh/authorized_keys
 ```
+
 <!-- 
     A bit of security here and there:
 -->
+
 For the security reasons I would strongly advise to disallow `root` logins over SSH. All SSH connections will be made by non-root user (larry in this example). Once a limited user account (larry) is connected, administrative privileges are accessible either by using `sudo` or changing to a root shell using `su -` command.<br><br>
 
 Lets edit a `/etc/ssh/sshd_config` file: 
+
 ```bash
 nano /etc/ssh/sshd_config
 ```
+
 and change `yes` to `no` in the `PermitRootLogin` line:<br>
+
 ```bash
 # Authentication:
 ...
 PermitRootLogin no
 ```
+
 <br><br>
 As we are going to use only key based authentication I recommend to disable SSH password authentication. This will require for all users allowed to connect via SSH to use key authentication only. Edit the same file:  
+
 ```bash
 nano /etc/ssh/sshd_config
 ```
+
 change the line `PasswordAuthentication yes` to disable clear text passwords:
+
 ```bash
 PasswordAuthentication no
 ```
+
 <br>
 <b>!!!</b>Though you may want to leave password authentication enabled if you connect to your Linode server from many different computers. This will allow you to authenticate with a password instead of generating and uploading a key-pair for every device.
 <br><br>
@@ -233,21 +287,28 @@ Specify to listen on only one internet protocol. The SSH daemon listens for inco
 
 Add this option as `AddressFamily` is usually  not in the `/etc/ssh/sshd_config` file by default. AddressFamily `inet` to listen only on IPv4 or `AddressFamily inet6` to listen only on IPv6.<br>
 Change accordingly to yours needs:
+
 ```bash
 echo 'AddressFamily inet' | sudo tee -a /etc/ssh/sshd_config
 ```
+
 or
+
 ```bash
 echo 'AddressFamily inet6' | sudo tee -a /etc/ssh/sshd_config
 ```
+
 <!-- 
    ADD something more about ssh ports!
 -->
+
 Finally change ssh port from default 22 to something different:<br>
+
 ```bash
 # What ports, IPs and protocols we listen for
 Port 3000
 ```
+
 In this example I'm going to use port 3000 for all ssh connections.
 <br><br>
 After that restart the SSH service to load the new configuration.
@@ -255,14 +316,18 @@ After that restart the SSH service to load the new configuration.
 ```bash
 sudo service ssh restart
 ```
+
 <br>
-<!-- Fail2ban is to heavy - it needs to be replaced (I've removed it from the server)
+
+<!-- Fail2ban is a bit too heavy - it needs to be replaced (I've removed it from the server) -->
+
 <p align="center">***
 <p align="center">**Fail2ban for SSH**<br>
 
 Fail2ban is a log-parsing application that monitors system logs for symptoms of an automated attack on your server. When an attempted attack is discovered, Fail2ban will add a new rule to iptables, thus blocking the IP address of the attacker (for a set amount of time or permanently - up to you really).<br>
 
 Install Fail2ban and iptables:
+
 ```bash
 emerge -av net-analyzer/fail2ban net-firewall/iptables net-firewall/ipset
 ```
@@ -273,10 +338,13 @@ For now go to `/etc/fail2ban`. Within this directory are all Fail2ban configurat
 ```bash
 cd /etc/fail2ban
 ```
+
 and check configuration files there:
+
 ```bash
 ls -l 
 ```
+
 The default fail2ban configuration file is location at /etc/fail2ban/jail.conf. The configuration work should not be done in that file, however, and we will instead make a local copy of it.<br>
 
 ```bash
@@ -290,6 +358,7 @@ Edit `jail.local` file:<br>
 ```bash
 nano /etc/fail2ban/jail.local
 ```
+
 The first section of defaults covers the basic rules that fail2ban will follow. If you want to set up more nuanced protection for your virtual private server, you can customize the details in each section.<br>
 Write your personal IP address into the `ignoreip` line. You can separate each address with a space. IgnoreIP allows you white list certain IP addresses and make sure that they are not locked out from your server. Including your address will guarantee that you do not accidentally ban yourself.<br> 
 
@@ -311,6 +380,7 @@ findtime  = 600
 # "maxretry" is the number of failures before a host get banned.
 maxretry = 3
 ```
+
 `Bantime` parameter is the number of seconds that a host would be blocked from the server if they are found to be in violation of any of the rules. This is especially useful in the case of various bots, that once banned, will simply move on to the next target. The default is set for 10 minutes—you may raise this to an hour (3600sec or even higher).<br>
 
 `Maxretry` parameter is the amount of incorrect login attempts that a host may have before they get banned for the length of the ban time.<br>
@@ -347,8 +417,8 @@ When all changes in the fail2ban configurations are set and saved, there is only
 ```bash
 sudo service fail2ban restart
 ```
+
 <br><br>
--->
 
 <p align="center"><b>***</b></p>
 <p align="center"><b>IPTABLES:</b></p>
@@ -356,6 +426,7 @@ sudo service fail2ban restart
 
 It is time for the iptables configuration.<br>
 There are few things to do, before we install it. First go and edit `/etc/portage/package.use`:
+
 ```bash
 www-servers/nginx aio http http2 http-cache ipv6 nginx_modules_http_autoindex nginx_modules_http_browser nginx_modules_http_empty_gif nginx_modules_http_fancyindex nginx_modules_http_gzip ssl http_v2_module ngx_http_v2_module nginx_modules_image_filter ngx_http_empty_gif nginx_modules_http_referer nginx_modules_http_geo nginx_modules_http_geoip nginx_modules_http_gunzip nginx_modules_http2
 
@@ -377,14 +448,19 @@ net-firewall/ipset -modules
 # required by @world (argument)
 >=media-libs/gd-2.2.3 png jpeg
 ```
+
 Lets install it:
+
 <!--```bash
 emerge -av net-analyzer/fail2ban net-firewall/iptables net-firewall/ipset
 ```
+
 -->
+
 ```bash
 emerge -av net-firewall/iptables net-firewall/ipset
 ```
+
 To check the rules that iptables puts in effect religiously memorise the following command:<br>
 
 ```bash
@@ -396,6 +472,7 @@ Iptables is the controller for netfilter, the Linux kernel’s packet filtering 
 Appropriate firewall rules depend on the services being run. Below are iptables rulesets to secure your web server.<br>
 
 Setup firewall rules in a new file:<br>
+
 ```bash
 sudo nano /etc/iptables.firewall.rules
 ```
@@ -454,6 +531,7 @@ Paste the following into `/etc/iptables.firewall.rules`:
 
 COMMIT
 ```
+
 Yep. Rule `-A INPUT -p tcp -m set --match-set china src -j DROP` is a brilliant thing. Nothing personal guys.<br>
 I was tired of all awkward traffic from china. Actually not even a single website I'm hosting is directed for that region. I'm even thinking to extend it a bit for Russia and Ukraine  as well. Websites I'm hosting usually if not always are for local makrket or a single country only. Nothing 'THAT BIG' for a global reach or something like that (lets be serious though - this is one small VPS). The amount of sniffers, bots and bad IPs from China, Russia, Ukraine and Romania is teryfying. Hundreds to thousands daily.. :/ For a small servers bots trying to get in through the ssh port:22 every 3 seconds or sniffers looking for security hole in particular software (mysql and php related usually) it is nuisance and waste of computing resources.<br>
 
@@ -508,6 +586,7 @@ Before we go any further there is a need to install one more thing:
 ```bash
 emerge -av net-firewall/ipset
 ```
+
 Coutry based rules in IPTABLES won't work without IPSET. So we need IPSET to smartly block some countries. :/ <br>
 
 Restore IPTABLES rules now to make them filter all network traffic:
@@ -564,43 +643,58 @@ and<br>
 <br><br>
 For example, to enable the spdy module:<br>
 Edit `/etc/portage/make.conf` and add:
+
 ```bash
 NGINX_MODULES_HTTP="spdy"
 ```
+
 That will overwrite the default value of NGINX_MODULES_HTTP and set it to spdy. To enable the spdy without overwriting the default NGINX_MODULES_HTTP, use local USE flag which can be specified in `/etc/portage/package.use`:<br>
+
 ```bash
 www-servers/nginx NGINX_MODULES_HTTP: spdy
 ```
+
 You definitely should check the complete list of USE flags specified for <a target="_blank" href="https://packages.gentoo.org/packages/www-servers/nginx">www-servers/nginx</a> package.<br>
 Ask what flags nginx have enabled by default:
+
 ```bash
 equery uses nginx
 ```
+
 And change flags accordingly to your needs in the `/etc/portage/make.conf`. For starters it should look like:<br>
+
 ```bash
 USE="aio bindist http http-cache http2 ipv6 mmx pcre poll select sse sse2 ssl threads -cpp_test -debug -google_perftools"
 
 NGINX_MODULES_HTTP="autoindex browser charset empty_gif geo gzip limit_conn limit_req map proxy referer rewrite scgi split_clients ssi upstream_hash upstream_ip_hash upstream_keepalive upstream_least_conn upstream_zone userid uwsgi geoip gunzip gzip_static image_filter realip"
 ```
+
 I'm sure that portage with throw some errors here and there.
 
 ```bash
 
 ```
+
 <br>
 With all USE flags set, lets install www-servers/nginx:
+
 ```bash
 emerge --ask www-servers/nginx
 ```
+
 The nginx package will install an init service script allowing you to stop, start, or restart the service.<br> 
 For example to start the nginx service do:
+
 ```bash
 service nginx start
 ```
+
 To restart do:
+
 ```bash
 service nginx restart
 ```
+
 You get that? ;) 
 
 <b>BUT DON'T START NGINX YET!!</b>
@@ -1004,54 +1098,69 @@ http {
         include /etc/nginx/sites-enabled/*.conf;
 }
 ```
+
 <br>
 Inside of `nginx.conf` there are a few things we need to cover now before anything else. There is a GeoIP module to install and set up. The <a target="_blank" href="http://dev.maxmind.com/geoip/geoip2/geolite2/">GeoLite</a> databases are distributed under the Creative Commons Attribution-ShareAlike 4.0 International License by <a target="_blank" href="http://www.maxmind.com">http://www.maxmind.com</a>.
 
 ```bash 
 emerge -Ss sys-process/dcron dev-libs/geoip net-misc/geoipupdate
 ```
+
 This will install "geoiplookup" and "geoipupdate" to update the database.<br>
 As the geoiplookup database will be pretty outdated you might want to update it regularly as IP assignment changes. One way of doing that is to use a crontab. Get that database installed. First country rules:
+
 ```bash
 wget -q https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz
 -O - | gunzip > /etc/nginx/geoip/GeoIP.dat.new && mv /etc/nginx/geoip/GeoIP.dat.new /etc/nginx/geoip/GeoIP.dat 
 ```
+
 <br>
 Then city rules (because why not?):
+
 ```bash
 mkdir /etc/nginx/geoip && cd /etc/nginx/geoip && wget -N https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz && gunzip GeoLiteCity.dat.gz
-
 ```
+
 To update it regularly create a new file in the cron.monthly:
+
 ```bash
 nano /etc/cron.monthly/GeoIP
 ```
+
 Inside of that file put that script:
+
 ```bash
 #!/bin/bash
 wget -q https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz -O - | gunzip > /etc/nginx/geoip/GeoCity.dat.new && mv /usr/share/geoip/GeoCity.dat.new /usr/share/geoip/GeoCity.dat
 wget -q https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz -O - | gunzip > /etc/nginx/geoip/GeoIP.dat.new && mv /etc/nginx/geoip/GeoIP.dat.new /etc/nginx/geoip/GeoIP.dat
 ```
+
 Now we can start our freshly installed `dcron`:
+
 ```bash
 /etc/init.d/dcron start
 rc-update add dcron default
 ```
+
 GeoIP is set and running.<br>
 More informations about GeoIP datasets are <a target="_blank" href="https://dev.maxmind.com/geoip/geoip2/geolite2/">here</a>.
 <br>
 Lets install something lightweight to rotate system logs:
+
 ```bash 
 emerge -av app-admin/metalog
 rc-update add metalog default
 ```
+
 It looks a bit chaotic.. - but don't worry :). A few final touches with nginx and we are done here. 
 In the `/etc/nginx/nginx.conf` file - there is `mime.types` line - right? Lets check if we have it as it should be:
 
 ```bash
 nano /etc/nginx/mime.types
 ```
+
 Inside of `mime.types` we can specify exactly what types of file nginx can serve. Here is a comprehensive list of all files you can include inside `mime.types`:
+
 ```bash
 types {
     text/html                             html htm shtml;
@@ -1151,6 +1260,7 @@ Now lets edit `/etc/nginx/sites-available/example.conf` file (change 'example' a
 ```bash
 nano /etc/nginx/sites-available/example.conf
 ```
+
 Inside of that file we need to put a lot of informations. Remember that we are going for a performance savy configuration here. In examples below I'll show you my two 'optimal' configurations I use for various websites.
 <br>
 <br>
@@ -1199,9 +1309,11 @@ server {
     }
 }
 ```
+
 <br>
 <br>
 <p align="center"><b>VERSION 2</b> (extended):<br> 
+
 ```bash
 # www to no www:
 server {
@@ -1344,6 +1456,7 @@ server {
        return 301 https://example.com$request_uri;
 }
 ```
+
 <br>
 Start with the 'version 1' and configure it carefully. When you are happy with your results start adding changes from the 'version 2' 
 <br><br>
@@ -1352,19 +1465,25 @@ When your `example.conf` is done and save - it is time to link it to the `/etc/n
 ```bash
 ln -s /etc/nginx/sites-available/example.conf /etc/nginx/sites-enabled/aaaexample.conf
 ```
+
 Above I've wrote `aaaexample.conf` to set which websites is set as the first and main for nginx server. There is no logic behind that you can name it as you want as long as you know what you are doing.<br><br>
 
 All is set and in place (probably). Lets test it:<br>
+
 ```bash
 nginx -t
 ```
+
 Eliminate all errors from your configs. run `nginx -t` to the moment you have good working setup.<br> 
 And push it online:<br>
+
 ```bash
 service nginx start
 ```
+
 <br>
 Finally add nginx to the start:
+
 ```bash
 rc-update add nginx default
 ```
