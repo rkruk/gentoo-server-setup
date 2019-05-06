@@ -1490,9 +1490,4 @@ Finally add nginx to the start:
 rc-update add nginx default
 ```
 
-<b>TO DO:</b>
-<br>
-- [ ] services,
-- [ ] configuration of metalog, denyhosts, ntp daemon, etc..
-- [ ] tests,
-- [ ] apply tighter security.
+<br><br>
