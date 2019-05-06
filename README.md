@@ -1266,7 +1266,9 @@ Inside of that file we need to put a lot of informations. Remember that we are g
 <br>
 Let's try something smaller at the beginning (you can extend it later):<br><br>
 <p align="center"><b>VERSION 1</b>(recommended):<br>
+
 ```bash
+
 server {
     listen 80;
     server_name www.example.com;
