@@ -314,7 +314,7 @@ In this example I'm going to use port 3000 for all ssh connections.
 After that restart the SSH service to load the new configuration.
 
 ```bash
-sudo service ssh restart
+sudo rc-service sshd restart
 ```
 
 <br>
