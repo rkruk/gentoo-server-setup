@@ -44,7 +44,7 @@ passwd adminuser
 ### Basic Security
 <br>
 SSH Configuration
-<br>
+
 Edit `/etc/ssh/sshd_config`:
 
 ```bash
@@ -87,7 +87,7 @@ chown -R nginx:nginx /var/www/example.com
 ```
 
 Base Configuration
-<br>
+
 Create `/etc/nginx/nginx.conf`:
 
 ```bash
@@ -146,7 +146,7 @@ http {
 ```
 <br>
 Site Configuration
-<br>
+
 Create `/etc/nginx/sites-available/example.conf`:
 
 ```bash
@@ -266,7 +266,8 @@ echo "dev-lang/php fpm mysqli pdo ssl" >> /etc/portage/package.use/php
 emerge --ask dev-lang/php
 ```
 <br>
-Configure PHP-FPM<br>
+Configure PHP-FPM
+
 Edit `/etc/php/fpm-php8.2/php-fpm.conf`:
 
 ```bash
@@ -443,7 +444,7 @@ define('DISABLE_WP_CRON', true);
 ### Security Hardening
 <br>
 Fail2ban Configuration:
-<br>
+
 Create `/etc/fail2ban/jail.local`:
 
 ```bash
@@ -472,7 +473,7 @@ modsecurity_rules_file /etc/nginx/modsecurity/main.conf;
 ### Backup Strategy
 <br>
 Create Backup Script
-<br>
+
 Create `/root/backup.sh`:
 
 ```bash
