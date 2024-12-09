@@ -11,11 +11,11 @@
 - [Basic Security](#basic-security)
 - [Nginx Installation](#nginx-installation)
 - [PHP Installation](#php-installation)
-- [MySQL/MariaDB Setup](#database-setup)
+- [MySQL/MariaDB Setup](#database-setup) [TO DO]
 - [SSL Certificates](#ssl-certificates)
-- [WordPress Configuration](#wordpress-configuration)
-- [Server Hardening](#server-hardening)
-- [Monitoring Setup](#monitoring-setup)
+- [WordPress Configuration](#wordpress-configuration) [TO DO]
+- [Server Hardening](#server-hardening) [TO REDO]
+- [Monitoring Setup](#monitoring-setup) [TO DO]
 
 ## Initial Server Setup
 
@@ -66,7 +66,7 @@ iptables -A INPUT -p tcp --dport 2222 -j ACCEPT
 iptables -P INPUT DROP
 ```
 
-Nginx Installation
+### Nginx Installation
 <br>
 Install Nginx
 
@@ -257,15 +257,16 @@ nginx -t
 rc-service nginx start
 rc-update add nginx default
 ```
-<br>
+
 ### PHP Installation
 <br>
 Install PHP-FPM
+
 ```bash
 echo "dev-lang/php fpm mysqli pdo ssl" >> /etc/portage/package.use/php
 emerge --ask dev-lang/php
 ```
-<br>
+
 Configure PHP-FPM
 
 Edit `/etc/php/fpm-php8.2/php-fpm.conf`:
@@ -294,7 +295,7 @@ Start PHP-FPM
 rc-service php-fpm start
 rc-update add php-fpm default
 ```
-<br>
+
 ### SSL Certificates
 <br>
 Install acme.sh
@@ -308,7 +309,7 @@ Generate Certificates
 ```bash
 acme.sh --issue -d example.com -w /var/www/example.com
 ```
-<br>
+
 ### Server Monitoring
 <br>
 Install Monitoring Tools
@@ -324,7 +325,7 @@ Enable Services
 rc-update add telegraf default
 rc-update add netdata default
 ```
-<br>
+
 ### Regular Maintenance
 <br>
 Create Maintenance Script
@@ -368,7 +369,7 @@ Add to crontab:
 ```bash
 0 3 * * * /root/server-maintenance.sh
 ```
-<br>
+
 ### Troubleshooting
 <br>
 Common Issues:
@@ -403,7 +404,7 @@ openssl s_client -connect example.com:443 -tls1_3
 # Check certificate expiry
 openssl x509 -enddate -noout -in /etc/letsencrypt/live/example.com/cert.pem
 ```
-<br>
+
 ### Performance Optimization
 <br>
 Enable HTTP/3:
@@ -430,18 +431,20 @@ brotli on;
 brotli_comp_level 6;
 brotli_types text/plain text/css application/javascript application/json image/svg+xml;
 ```
-<br>
+
 ### WordPress Optimization
 <br>
 Add to wp-config.php:
 
 ```bash
 <?php
+<!-- The rest of the wp-config.php code-->
 define('WP_CACHE', true);
 define('DISABLE_WP_CRON', true);
+<!--Insert it somewhere at the end of the file -->
 ```
-<br>
-### Security Hardening
+
+### Server Hardening
 <br>
 Fail2ban Configuration:
 
@@ -469,7 +472,7 @@ Add to nginx.conf:
 modsecurity on;
 modsecurity_rules_file /etc/nginx/modsecurity/main.conf;
 ```
-<br>
+
 ### Backup Strategy
 <br>
 Create Backup Script
