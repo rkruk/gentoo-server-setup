@@ -31,6 +31,30 @@
 - [Implement SELinux or AppArmor](#implement-selinux-or-apparmor)
 - [Final Recommendations](#final-recommendations)
 
+## Project Description
+
+This project provides a comprehensive guide for setting up a secure Gentoo server with Nginx for WordPress hosting. It covers initial server setup, basic security measures, installation of necessary software, and configuration details to ensure optimal performance and security.
+<br><br>
+Follow the steps in each section of this guide to set up your server.<br>
+
+## Usage Instructions
+This guide is intended for setting up a secure Gentoo server for hosting WordPress websites.<br> 
+Follow the detailed instructions provided in each section to complete the setup.
+
+## Contributing Guidelines
+Contributions are welcome! Please submit a pull request or open an issue to discuss any changes or improvements.
+
+## License Information
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/rkruk/gentoo-server-setup/blob/6b6dfbca24b6335f35da514924ac1524eec5456a/LICENSE) file for more details.
+<br><br>
+
+## Installation Instructions
+1. Clone the repository:
+```bash
+git clone https://github.com/rkruk/gentoo-server-setup.git
+cd gentoo-server-setup
+```
+
 ## Initial Server Setup
 
 ### System Update
