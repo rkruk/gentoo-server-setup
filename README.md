@@ -1642,9 +1642,12 @@ Implement Additional Security Layers: Consider using intrusion detection systems
 
 ### Introduction<br>
 Implementing an Intrusion Detection System (IDS) like Snort or Suricata adds an additional layer of security by monitoring network traffic for suspicious activities and potential threats.
+<br><br><br>
+<h1><b></b>Some of these recommendations require powerful hardware with lots of RAM<br> (Elasticsearch, Kibana, etc.. eat up RAM like cookies)</b></h1>
 <br><br>
-<h4><b></b>Some of these recommendations require powerful hardware with lots of RAM (elasticsearch eats up RAM like cookies)</b></h4>
+If you don't have hardware with 32Gb RAM,... just tinker around the monitoring, drop the elasticsearch, kibana, snort, suricata - and you can fit this configuration into the small VPS with the 2-4Gb RAM (for a few websites with moderate traffic).<br>
 <br><br>
+
 ## Option 1: Setting Up Suricata<br>
 Install Suricata
 
@@ -2083,7 +2086,7 @@ echo "0 3 * * * root /usr/local/sbin/clamav_scan.sh" >> /etc/crontab
 ## Automate IPSet Updates<br>
 Ensure that the `update-country-blocks.sh` script runs periodically to keep IP sets updated.<br>
 
-## Already scheduled in [Firewall Configuration](#firewall-configuration)
+## Already scheduled in [Firewall Configuration](#firewall-configuration) <br>
 ## Ensure the cron job exists
 
 ```bash
