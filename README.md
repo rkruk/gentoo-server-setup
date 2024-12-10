@@ -20,6 +20,7 @@
   - [Limit User Privileges](#limit-user-privileges)
   - [Use Fail2Ban](#use-fail2ban)
 - [Nginx Installation](#nginx-installation)
+- [Node.js Setup](#nodejs-setup)
 - [PHP Installation](#php-installation)
 - [MySQL/MariaDB Setup](#database-setup)
 - [SSL Certificates](#ssl-certificates)
@@ -254,30 +255,32 @@ Update `/etc/iptables/firewall.rules` to include the additional countries:
 COMMIT
 ```
 
-Explanation:
+### Explanation:
 
-Added ipset rules to block traffic from:<br>
--India (IN),<br>
--Pakistan (PK),<br>
--Russia (RU),<br>
--Belarus(BY),<br>
--China(CN),<br>
-<br>
-and selected African countries:<br>
--DZ for Algeria,<br>
--AO for Angola,<br>
--EG for Egypt,<br>
--NG for Nigeria,<br>
--ZA for South Africa,<br>
--KE for Kenya,<br>
--UG for Uganda,<br>
--GH for Ghana,<br>
--TZ for Tanzania,<br>
--MA for Morocco,<br>
--TN for Tunisia,<br>
--CM for Cameroon,<br>
--IQ for Iraq,<br>
--SY for Syria.<br><br>
+Added `ipset` rules to block traffic from:
+
+- **India (IN)**
+- **Pakistan (PK)**
+- **Russia (RU)**
+- **Belarus (BY)**
+- **China (CN)**
+
+and selected African countries:
+
+- **Algeria (DZ)**
+- **Angola (AO)**
+- **Egypt (EG)**
+- **Nigeria (NG)**
+- **South Africa (ZA)**
+- **Kenya (KE)**
+- **Uganda (UG)**
+- **Ghana (GH)**
+- **Tanzania (TZ)**
+- **Morocco (MA)**
+- **Tunisia (TN)**
+- **Cameroon (CM)**
+- **Iraq (IQ)**
+- **Syria (SY)**
 
 Schedule IPSet Updates<br>
 Automate the `update-country-blocks.sh` script to run periodically.
@@ -770,6 +773,273 @@ Descriptions:
 `rc-service nginx restart`: Restarts the Nginx service.<br>
 `rc-service nginx reload`: Reloads the Nginx configuration without stopping the service.<br>
 `rc-update add nginx default`: Enables Nginx to start automatically on system boot.<br>
+
+## Node.js Setup
+
+### Install Node.js and npm
+
+```bash
+# Sync the Portage tree
+emerge --sync
+
+# Update the system to ensure all packages are up to date
+emerge -avuDN @world
+
+# Install Node.js and npm
+emerge --ask dev-lang/nodejs
+```
+
+Configure Node.js Environment
+
+1.Set Up a Dedicated User for Node.js Applications:
+```bash
+useradd -m -G users,wheel -s /bin/bash nodeuser
+passwd nodeuser
+```
+
+2.Switch to the Node.js User:
+
+```bash
+su - nodeuser
+```
+
+3.Initialize a New Node.js Project:
+```bash
+mkdir ~/myapp
+cd ~/myapp
+npm init -y
+```
+
+Install Essential Node.js Packages
+```bash
+npm install express helmet morgan rate-limiter-flexible
+```
+
+- **express: Web framework for Node.js.**
+- **helmet: Secures Express apps by setting various HTTP headers.**
+- **morgan: HTTP request logger middleware.**
+- **rate-limiter-flexible: Flexible rate limiter for Express.**
+
+Create a Secure Express Application<br>
+1.Create `app.js`:
+```bash
+const express = require('express');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const { RateLimiterMemory } = require('rate-limiter-flexible');
+
+const app = express();
+
+// Set security-related HTTP headers
+app.use(helmet());
+
+// Setup request logging
+app.use(morgan('combined'));
+
+// Rate limiting middleware
+const rateLimiter = new RateLimiterMemory({
+  points: 100, // Number of points
+  duration: 60, // Per second
+});
+
+app.use((req, res, next) => {
+  rateLimiter.consume(req.ip)
+    .then(() => {
+      next();
+    })
+    .catch(() => {
+      res.status(429).send('Too Many Requests');
+    });
+});
+
+app.get('/', (req, res) => {
+  res.send('Hello, secure Node.js app!');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+```
+
+2.Secure Application Configuration:
+  - **Environment Variables: Store sensitive information like API keys and database credentials in environment variables or a `.env` file using packages like `dotenv.`**
+
+```bash
+npm install dotenv
+```
+
+```bash
+require('dotenv').config();
+const dbPassword = process.env.DB_PASSWORD;
+```
+
+Set Up Reverse Proxy with Nginx<br>
+Configure Nginx as a Reverse Proxy:
+
+```bash
+nano /etc/nginx/sites-available/nodejs-app.conf
+```
+
+Example Configuration:
+
+```bash
+server {
+    listen 80;
+    server_name node.example.com;
+
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Optional: Enable SSL
+    listen 443 ssl http2;
+    ssl_certificate /etc/letsencrypt/live/node.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/node.example.com/privkey.pem;
+
+    include /etc/nginx/snippets/ssl-params.conf;
+}
+```
+
+2.Enable the Node.js Site Configuration:
+
+```bash
+ln -s /etc/nginx/sites-available/nodejs-app.conf /etc/nginx/sites-enabled/nodejs-app.conf
+```
+
+3.Test and Reload Nginx:
+
+```bash
+nginx -t
+rc-service nginx reload
+```
+
+Implement Proper Logging<br>
+1.Configure Log Rotation for Application Logs:
+
+```bash
+nano /etc/logrotate.d/nodejs-app
+```
+
+Example Configuration:
+
+```bash
+/var/www/myapp/logs/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 nodeuser www-data
+    sharedscripts
+    postrotate
+        systemctl reload nginx > /dev/null 2>/dev/null || true
+    endscript
+}
+```
+
+2.Use a Process Manager (e.g., PM2) for Enhanced Logging and Management:
+
+```bash
+npm install pm2 -g
+```
+
+```bash
+pm2 start app.js
+pm2 startup
+pm2 save
+```
+
+Note: PM2 can be configured to start on system boot and manage logs effectively.<br><br>
+
+## Security Best Practices
+Keep Dependencies Updated:<br>
+
+Regularly update Node.js and all npm packages to patch vulnerabilities.
+
+```bash
+npm update
+```
+
+Use HTTPS:
+
+- **Always serve your application over HTTPS to encrypt data in transit.**
+- **Validate and Sanitize Inputs:**
+- **Ensure all user inputs are validated and sanitized to prevent injection attacks.**
+- **Implement CORS Policies:**
+- **Configure Cross-Origin Resource Sharing (CORS) appropriately.**
+
+```bash
+npm install cors
+```
+
+```bash
+const cors = require('cors');
+app.use(cors({
+  origin: 'https://yourdomain.com',
+  optionsSuccessStatus: 200
+}));
+```
+
+Limit Request Sizes:<br><br>
+
+Prevent denial-of-service (DoS) attacks by limiting the size of incoming requests.
+
+```bash
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ limit: '10kb', extended: true }));
+```
+
+Start and Enable Node.js Application<br>
+1.Using PM2:
+
+```bash
+pm2 start app.js
+pm2 startup
+pm2 save
+```
+
+2.Using OpenRC:<br>
+Create a service script for your Node.js application.
+
+```bash
+nano /etc/init.d/nodejs-app
+```
+
+Example Service Script:
+
+```bash
+#!/sbin/openrc-run
+command="/usr/bin/node"
+command_args="/var/www/myapp/app.js"
+name="nodejs-app"
+description="Node.js Application"
+
+depend() {
+    need net
+    after nginx
+}
+```
+
+Make the script executable and add it to the default runlevel.
+
+```bash
+chmod +x /etc/init.d/nodejs-app
+rc-update add nodejs-app default
+rc-service nodejs-app start
+```
+<br><br>
+
 
 ## PHP Installation
 
@@ -1368,7 +1638,207 @@ Regularly Review and Update Rules: Periodically assess and update your firewall 
 Implement Additional Security Layers: Consider using intrusion detection systems (IDS) like Fail2Ban, regular security audits with Lynis, and keeping all software up to date.<br>
 <br>
 
-Automated Security Audits and Email Reporting<br>
+## Intrusion Detection Systems
+
+### Introduction<br>
+Implementing an Intrusion Detection System (IDS) like Snort or Suricata adds an additional layer of security by monitoring network traffic for suspicious activities and potential threats.
+<br><br>
+<h4><b></b>Some of these recommendations require powerful hardware with lots of RAM (elasticsearch eats up RAM like cookies)</b></h4>
+<br><br>
+## Option 1: Setting Up Suricata<br>
+Install Suricata
+
+```bash
+emerge --ask net-analyzer/suricata
+```
+
+Configure Suricata<br>
+1.Copy Default Configuration:
+
+```bash
+cp /etc/suricata/suricata.yaml.example /etc/suricata/suricata.yaml
+```
+
+2.Edit suricata.yaml:
+
+```bash
+nano /etc/suricata/suricata.yaml
+```
+
+- **Interface Configuration:** 
+Specify the network interface to monitor.
+
+```bash
+af-packet:
+  - interface: eth0
+    threads: auto
+    defrag: yes
+```
+
+- **Logging Configuration:** 
+Define logging preferences.
+
+```bash
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: /var/log/suricata/eve.json
+      types:
+        - alert:
+            payload: yes
+            payload-printable: yes
+            packet: yes
+            hostnames: yes
+            http: yes
+```
+
+Enable and Start Suricata
+
+```bash
+rc-service suricata start
+rc-update add suricata default
+```
+
+Update Ruleset<br>
+1.Install suricata-update:
+
+```bash
+emerge --ask net-analyzer/suricata-update
+```
+
+2.Update and Manage Rules:
+
+```bash
+suricata-update update-sources
+suricata-update
+rc-service suricata restart
+```
+
+<br><br>
+## Option 2: Setting Up Snort<br>
+
+Install Snort
+
+```bash
+emerge --ask net-analyzer/snort
+```
+
+Configure Snort<br>
+1. Copy Default Configuration:
+
+```bash
+cp /etc/snort/snort.conf.example /etc/snort/snort.conf
+```
+
+2.Edit snort.conf:
+
+```bash
+nano /etc/snort/snort.conf
+```
+
+Variable Definitions:<br>
+Set network variables.
+
+```bash
+var HOME_NET 192.168.1.0/24
+var EXTERNAL_NET !$HOME_NET
+```
+
+Include Rules:<br>
+Include necessary rule files.
+
+```bash
+include $RULE_PATH/local.rules
+include $RULE_PATH/community.rules
+```
+
+Output Configuration:<br>
+Define output formats.
+
+```bash
+output alert_fast: stdout
+output alert_syslog: LOG_AUTH LOG_ALERT
+```
+
+Enable and Start Snort
+
+```bash
+rc-service snort start
+rc-update add snort default
+```
+
+Update Ruleset
+1.Subscribe to Snort Rules:<br>
+  Register and obtain a ruleset from Snort.org.<br><br>
+2.Download and Install Rules:
+
+```bash
+snort-update download-community-rules
+snort-update install-community-rules
+rc-service snort restart
+```
+
+## Integrate IDS with Logging and Alerts <br>
+1.Install Elasticsearch, Logstash, and Kibana (ELK Stack) for Log Management:
+
+```bash
+emerge --ask dev-db/elasticsearch dev-app-analogue/logstash dev-app-analogue/kibana
+```
+
+2.Configure Logstash to Parse IDS Logs:
+
+```bash
+nano /etc/logstash/conf.d/suricata.conf
+```
+
+Example Configuration for Suricata:
+
+```bash
+input {
+  file {
+    path => "/var/log/suricata/eve.json"
+    codec => json
+  }
+}
+
+filter {
+  if [event_type] == "alert" {
+    mutate { rename => { "src_ip" => "source.ip" } }
+    mutate { rename => { "dest_ip" => "destination.ip" } }
+    mutate { rename => { "alert.signature" => "event.signature" } }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["localhost:9200"]
+    index => "suricata-%{+YYYY.MM.dd}"
+  }
+}
+```
+
+3.Configure Kibana Dashboards for IDS Alerts:<br>
+
+Access Kibana at `http://your_server_ip:5601` and set up dashboards to visualize and monitor IDS alerts.<br><br>
+
+Best Practices for IDS<br>
+Regularly Update Rulesets: Keep your IDS rules updated to recognize the latest threats.
+
+```bash
+suricata-update
+rc-service suricata restart
+```
+
+- **Monitor Logs Continuously: Use centralized logging solutions like the ELK Stack to analyze and visualize IDS alerts.**
+- **Implement Automated Responses: Configure scripts or tools to respond to certain IDS alerts automatically, such as blocking offending IPs.**
+- **Conduct Regular Audits: Periodically review IDS logs and alerts to assess the security posture and adjust rules as necessary.**
+<br>
+
+Summary<br>
+Implementing a robust Intrusion Detection System like Suricata or Snort significantly enhances your server's security by providing real-time monitoring and alerting capabilities. Coupled with proper configuration, regular updates, and integration with logging tools, an IDS serves as a critical component in defending against unauthorized access and malicious activities.<br><br>
+
+## Automated Security Audits and Email Reporting<br>
 
 
 ## Install Lynis
