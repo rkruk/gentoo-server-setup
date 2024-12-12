@@ -2,7 +2,7 @@
   <img src="https://github.com/rkruk/gentoo-server-setup/blob/master/larry.png">
 </p>
 <br>
-<p align="center"><b>GENTOO WEB SERVER SETUP GUIDE</b></p>
+<p align="center"><b>GENTOO WEB SERVER<br> SETUP GUIDE</b></p>
 
 <p align="center"><b>A comprehensive guide for setting up a secure Gentoo server with Nginx for WordPress hosting.</b></p>
 
