@@ -126,14 +126,48 @@ Replace sendmail binary (used by cron, logwatch, etc.):
 ln -sf /usr/bin/msmtp /usr/sbin/sendmail
 ```
 
+## Step 6: Configure Swap (Critical for 1GB RAM VPS)
+
+Create a 2GB swap file for memory management:
+
+```bash
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+```
+
+Make it permanent:
+
+```bash
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+```
+
+Optimize swap usage for VPS:
+
+```bash
+echo 'vm.swappiness=10' >> /etc/sysctl.conf
+echo 'vm.vfs_cache_pressure=50' >> /etc/sysctl.conf
+sysctl -p
+```
+
+Verify:
+
+```bash
+free -h
+cat /proc/swaps
+```
+
+---
+
 At this point, your system is:
 - Updated to latest packages
 - Running as a non-root user by default
 - Using su - for privilege escalation
 - Equipped with cron and logging
 - Capable of sending email via external SMTP
-- No unnecessary services have been installed. No container tools, web panels, or daemons you don’t need to control.
-
+- Optimized with swap for 1GB RAM VPS
+- No unnecessary services have been installed. No container tools, web panels, or daemons you don't need to control.
 
 Next step → 02 – SSH and Firewall Hardening
 
