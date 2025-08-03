@@ -1,4 +1,3 @@
-
 # 02 – SSH Hardening and Firewall
 
 This section covers:
@@ -163,7 +162,7 @@ rc-update add iptables default
 Install required tools:
 
 ```bash
-emerge --ask net-firewall/ipset
+emerge -av net-firewall/ipset net-misc/curl
 ```
 
 Create update script:
@@ -180,7 +179,16 @@ mkdir -p "$TMPDIR"
 for COUNTRY in $COUNTRIES; do
     ZONE_FILE="${TMPDIR}/${COUNTRY}.zone"
     echo "[*] Downloading $COUNTRY block list..."
-    curl -s -o "$ZONE_FILE" "${BASE_URL}/${COUNTRY}.zone"
+    
+    if ! curl -s -o "$ZONE_FILE" "${BASE_URL}/${COUNTRY}.zone"; then
+        echo "[-] Failed to download $COUNTRY zone file"
+        continue
+    fi
+    
+    if [ ! -s "$ZONE_FILE" ]; then
+        echo "[-] Downloaded $COUNTRY zone file is empty"
+        continue
+    fi
 
     ipset list "$COUNTRY" >/dev/null 2>&1
     if [ $? -ne 0 ]; then
@@ -204,6 +212,9 @@ for COUNTRY in $COUNTRIES; do
     fi
 done
 
+# Save iptables rules to persist country blocks
+iptables-save > /etc/iptables.rules
+
 echo "[✓] IP sets updated and rules applied."
 ```
 
@@ -226,7 +237,7 @@ Create `/etc/local.d/ipsets.start`:
 ```bash
 #!/bin/sh
 /usr/local/bin/update-ipsets.sh
-````
+```
 
 Make it executable:
 
@@ -235,8 +246,60 @@ chmod +x /etc/local.d/ipsets.start
 rc-update add local default
 ```
 
-ipdeny.com provides regularly updated country zone files over HTTPS. While undocumented, it is actively maintained and functional as of 2025. 
+`ipdeny.com` provides regularly updated country zone files over HTTPS. While undocumented, it is actively maintained and functional as of 2025. 
 You could additionally do some script to check for the updates of the data from the websites. Up to you really.
+You can also add more countries by modifying the `COUNTRIES` variable in the script. I just always add my favourite offenders like China and Russia, but you can add any country you want to block (hint hint: Belarus, some spammy african countries, etc..).
+
+## Step 6: Install and Configure fail2ban
+
+Install fail2ban for SSH brute-force protection:
+
+```bash
+emerge -av net-analyzer/fail2ban
+```
+
+Create basic jail configuration:
+
+```bash
+nano /etc/fail2ban/jail.local
+```
+
+Add SSH protection:
+
+```bash
+[DEFAULT]
+bantime = 3600
+findtime = 600
+maxretry = 5
+
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+bantime = 1800
+```
+
+Enable and start:
+
+```bash
+rc-update add fail2ban default
+/etc/init.d/fail2ban start
+```
+
+Or with systemd:
+
+```bash
+systemctl enable --now fail2ban
+```
+
+Check status:
+
+```bash
+fail2ban-client status
+fail2ban-client status sshd
+```
 
 
 

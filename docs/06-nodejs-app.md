@@ -41,14 +41,14 @@ Create index.js:
 ```js
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
   res.send('Node app is working!');
 });
 
-app.listen(port, () => {
-  console.log(`App listening at http://localhost:${port}`);
+app.listen(port, '127.0.0.1', () => {
+  console.log(`App listening at http://127.0.0.1:${port}`);
 });
 ```
 

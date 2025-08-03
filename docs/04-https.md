@@ -1,4 +1,3 @@
-
 <i>Add HTTPS support to your Gentoo VPS using Let's Encrypt, certbot, and NGINX. Supports both HTTP challenge and DNS challenge (for headless/VPS setups).</i>
 
 # 04 – HTTPS with Let's Encrypt
@@ -183,5 +182,27 @@ ssl_stapling_verify on;
 
 add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;
 ```
+
+## WordPress HTTPS Configuration
+
+After setting up HTTPS, you need to configure WordPress to work properly with SSL.
+
+Add these settings to your `wp-config.php` file:
+
+```php
+// Force WordPress to use HTTPS
+define('FORCE_SSL_ADMIN', true);
+
+// Handle SSL behind a reverse proxy (if applicable)
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+    $_SERVER['HTTPS'] = 'on';
+}
+
+// Ensure WordPress URLs use HTTPS
+define('WP_HOME','https://yourdomain.com');
+define('WP_SITEURL','https://yourdomain.com');
+```
+
+**Note:** Replace `yourdomain.com` with your actual domain name.
 
 

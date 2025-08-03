@@ -38,12 +38,14 @@ This guide is organized into logical, version-controlled steps. **Follow them in
 | **01** | [Initial Setup](docs/01-initial-setup.md) | Sync packages, install tools, create users, enable cron + msmtp |
 | **02** | [SSH & Firewall](docs/02-user-ssh-firewall.md) | SSH hardening, key-only auth, 2FA, iptables + ipset, country blocking |
 | **03** | [NGINX + PHP + MySQL](docs/03-nginx-php-mysql.md) | Complete LEMP stack installation and basic configuration |
-| **04** | [HTTPS Setup](docs/04-HTTPS.md) | Let's Encrypt SSL certificates (HTTP + DNS challenges) |
+| **04** | [HTTPS Setup](docs/04-https.md) | Let's Encrypt SSL certificates (HTTP + DNS challenges) |
 | **05** | [WordPress Install](docs/05-wordpress-install.md) | WordPress download, database setup, security, WP-CLI |
 | **06** | [Node.js Apps](docs/06-nodejs-app.md) | Node.js deployment, reverse proxy, process management |
 | **07** | [Logging & Monitoring](docs/07-logging-monitoring.md) | Log rotation, msmtp integration, Netdata setup |
 | **08** | [IDS & Audits](docs/08-ids-audits.md) | **Optional:** Lynis audits, Suricata/Snort IDS |
 | **09** | [Maintenance](docs/09-maintenance.md) | Backups, system updates, monitoring best practices |
+| **10** | [Advanced Hardening](docs/10-advanced-hardening.md) | **Optional:** AIDE, AppArmor, automated updates, performance baselines |
+| **11** | [Ultra-Lightweight Optimization](docs/11-ultra-lightweight-optimization.md) | **For 1GB VPS:** Maximum performance with lightweight services and micro-optimizations |
 
 ---
 
@@ -61,6 +63,12 @@ This guide is organized into logical, version-controlled steps. **Follow them in
 | **Let's Encrypt** | SSL/TLS certificates | Automated renewal via certbot/acme.sh |
 | **Netdata** | Real-time monitoring | Resource usage, performance metrics |
 | **Lynis** | Security auditing | **Optional** system hardening checks |
+| **AIDE** | File integrity monitoring | **Optional** detection of unauthorized changes |
+| **AppArmor** | Application confinement | **Optional** mandatory access control |
+| **syslog-ng** | Lightweight logging | **Ultra-optimization** alternative to rsyslog |
+| **dcron** | Minimal cron daemon | **Ultra-optimization** alternative to cronie |
+| **chrony** | Lightweight NTP | **Ultra-optimization** alternative to ntp |
+| **lighttpd** | Ultra-light web server | **Ultra-optimization** alternative to nginx |
 
 ---
 
@@ -116,10 +124,12 @@ This guide is organized into logical, version-controlled steps. **Follow them in
 - **Monitoring:** Netdata + email alerts for anomalies
 
 ###  **Performance Optimization**
-- **NGINX:** HTTP/2, Brotli compression, FastCGI caching
-- **PHP-FPM:** Tuned for small VPS (5-50 workers)
-- **MariaDB:** Minimal configuration, query cache
-- **Node.js:** PM2 process manager, reverse proxy
+- **Memory Management:** 2GB swap + aggressive caching for 1GB RAM
+- **NGINX:** Worker tuning, FastCGI cache, static file optimization
+- **PHP-FPM:** Dynamic process management (2-15 workers max)
+- **MariaDB:** 256MB buffer pool, query cache, performance schema off
+- **System:** Kernel parameter tuning, file handle limits
+- **Monitoring:** Automated memory/disk cleanup, service restart on failure
 
 ###  **Monitoring & Alerts**
 - **Logs:** Centralized via rsyslog, rotated daily
@@ -133,6 +143,67 @@ This guide is organized into logical, version-controlled steps. **Follow them in
 3. **Quarterly:** Run Lynis audit, review firewall rules
 4. **As needed:** Backup WordPress/Node.js app data
 
+---
+
+## 🚀 Quick Reference
+
+### Essential Commands:
+```bash
+# System updates
+emerge --sync && emerge -uavDN @world
+
+# Service management (OpenRC)
+rc-service nginx {start|stop|restart|reload|status}
+rc-service php-fpm {start|stop|restart|status}
+rc-service mariadb {start|stop|restart|status}
+
+# Service management (systemd)
+systemctl {start|stop|restart|reload|status} nginx
+systemctl {start|stop|restart|status} php-fpm
+systemctl {start|stop|restart|status} mariadb
+
+# Security checks
+fail2ban-client status
+lynis audit system
+netdata (visit :19999)
+
+# Log monitoring
+tail -f /var/log/nginx/error.log
+tail -f /var/log/auth.log
+journalctl -f
+
+# Performance monitoring
+free -h && df -h
+ps aux --sort=-%mem | head -10
+netstat -tuln
+iotop -ao1 (if installed)
+```
+
+### Performance Commands:
+```bash
+# Memory optimization
+echo 3 > /proc/sys/vm/drop_caches  # Clear page cache
+service php-fpm reload             # Reload without downtime
+nginx -s reload                    # Reload nginx config
+
+# MySQL optimization
+mysql -e "SHOW PROCESSLIST;"       # Check active queries
+mysql -e "SHOW ENGINE INNODB STATUS\G" | grep -A 20 "BUFFER POOL"
+mysqltuner.pl                      # MySQL tuning script (optional)
+
+# Disk cleanup
+du -sh /var/log/* | sort -h        # Check log sizes
+find /tmp -type f -atime +7 -delete # Clean old temp files
+journalctl --disk-usage            # Check journal size
+```
+
+### File Locations:
+- **NGINX config:** `/etc/nginx/nginx.conf`
+- **Site configs:** `/etc/nginx/sites-available/`
+- **PHP config:** `/etc/php/*/php.ini`
+- **WordPress:** `/var/www/wordpress/`
+- **SSL certs:** `/etc/letsencrypt/live/domain.com/`
+- **Logs:** `/var/log/nginx/`, `/var/log/auth.log`
 
 ---
 

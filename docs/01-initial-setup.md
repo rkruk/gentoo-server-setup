@@ -1,6 +1,6 @@
 # 01 – Initial System Setup
 
-> Prepare your Gentoo VPS: update packages, install essentials, configure a normal user, and set up basic services. Root access is controlled via `su -`. This is the first step before configuring your services.
+> Prepare your Gentoo VPS: update packages, install essentials, configure a normal user, and set up essential services. Root access is controlled via `su -`. This is the first step before configuring your services.
 
 ---
 
@@ -158,6 +158,36 @@ free -h
 cat /proc/swaps
 ```
 
+## Step 7: VPS Storage & Network Optimization
+
+### Optimize I/O scheduler for SSD VPS
+
+```bash
+echo 'noop' > /sys/block/vda/queue/scheduler  # or deadline
+```
+
+### Mount optimizations in /etc/fstab
+### Add noatime,nodiratime to reduce I/O
+
+```bash
+/dev/vda1  /  ext4  defaults,noatime,nodiratime  0 1
+
+# tmpfs for high-I/O directories (saves SSD wear)
+echo 'tmpfs /tmp tmpfs defaults,noatime,mode=1777,size=256M 0 0' >> /etc/fstab
+echo 'tmpfs /var/tmp tmpfs defaults,noatime,mode=1777,size=128M 0 0' >> /etc/fstab
+```
+
+### Additional TCP optimizations for VPS
+
+```bash
+cat >> /etc/sysctl.conf << EOF
+ TCP optimization for VPS
+net.core.somaxconn = 1024
+net.ipv4.tcp_max_syn_backlog = 2048
+net.ipv4.tcp_congestion_control = bbr
+EOF
+```
+
 ---
 
 At this point, your system is:
@@ -166,9 +196,9 @@ At this point, your system is:
 - Using su - for privilege escalation
 - Equipped with cron and logging
 - Capable of sending email via external SMTP
-- Optimized with swap for 1GB RAM VPS
-- No unnecessary services have been installed. No container tools, web panels, or daemons you don't need to control.
+- Configured with appropriate swap for 1GB RAM
+- No unnecessary services have been installed
 
-Next step → 02 – SSH and Firewall Hardening
+---
 
-
+Next step → [02 – SSH and Firewall Hardening](02-user-ssh-firewall.md)
