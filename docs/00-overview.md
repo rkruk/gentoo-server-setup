@@ -68,7 +68,7 @@ This project is broken into logical, version-controlled steps:
 - 01-initial-setup.md → Sync, tools, su -, service user
 - 02-user-ssh-firewall.md → SSH hardening, fail2ban/sshguard, firewall
 - 03-nginx-php-mysql.md → Full LEMP stack for WordPress
-- 04-HTTPS → SSL Certificate install for HTTPS
+- 04-HTTPS → SSL certificate install for HTTPS (Let's Encrypt)
 - 05-wordpress-install.md → WordPress download, config, permissions
 - 06-nodejs-app.md → Node app setup, reverse proxy, systemd/OpenRC
 - 07-logging-monitoring.md → Logs, logrotate, msmtp, netdata
