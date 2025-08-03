@@ -131,11 +131,8 @@ Optional: restrict IPs with allow/deny or a password.
 ## (Optional) Alerting
 
 Enable email alerts for `netdata`, `cron`, `fail2ban`, etc., by ensuring:
-
-msmtp is used as sendmail
-
-root mail forwards to your address
-
-You’ve tested sending manually
+- msmtp is used as sendmail
+- root mail forwards to your address
+- You’ve tested sending manually
 
 
