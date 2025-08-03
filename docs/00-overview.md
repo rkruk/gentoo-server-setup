@@ -65,3 +65,12 @@ This guide assumes full root access.
 
 This project is broken into logical, version-controlled steps:
 
+- 01-initial-setup.md → Sync, tools, su -, service user
+- 02-user-ssh-firewall.md → SSH hardening, fail2ban/sshguard, firewall
+- 03-nginx-php-mysql.md → Full LEMP stack for WordPress
+- 04-wordpress-install.md → WordPress download, config, permissions
+- 05-nodejs-app.md → Node app setup, reverse proxy, systemd/OpenRC
+- 06-logging-monitoring.md → Logs, logrotate, msmtp, netdata
+- 07-ids-audits.md → Optional: Lynis, Suricata/Snort
+- 08-maintenance.md → Backups, upgrades, monitoring tips
+
