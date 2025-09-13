@@ -145,7 +145,7 @@ This guide is organized into logical, version-controlled steps. **Follow them in
 
 ---
 
-## 🚀 Quick Reference
+## Quick Reference
 
 ### Essential Commands:
 ```bash
